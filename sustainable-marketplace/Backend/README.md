@@ -1,54 +1,98 @@
-# Sustainable Local Marketplace
+# 🌿 Sustainable Local Produce Marketplace – FarmNest
 
-## Project Description
-A sustainable marketplace platform connecting local producers with consumers, featuring product listings, bidding system, and messaging functionality.
+FarmNest is a full-fledged, scalable web application designed to seamlessly connect local farmers with consumers through a modern, technology-driven marketplace. The platform promotes sustainability, transparency, and efficiency in the fresh produce supply chain by enabling direct farmer-to-consumer interactions.
 
-## Current Features Implemented
-- **User Management**: Registration, authentication, and profile management
-- **Product Management**: Create, view, update, and delete product listings
-- **Bidding System**: Place and manage bids on products
-- **Order Processing**: Create and track orders
-- **Messaging System**: User-to-user communication
-- **Chat Functionality**: Real-time messaging between users
+By eliminating middlemen, FarmNest empowers local farmers to earn fair profits while providing buyers with access to fresh, organic, and locally sourced produce. The application integrates real-time features such as dynamic bidding, instant messaging, order tracking, and personalized product recommendations to enhance the overall user experience.
 
-## Technology Stack
-- **Backend**: Node.js with Express
-- **Database**: MongoDB (configured in config/database.js)
-- **Authentication**: JWT (implemented in middleware/authMiddleware.js)
+Built with a focus on innovation, scalability, and industry relevance, the platform serves as a digital ecosystem that supports ethical agriculture, local economies, and environmentally responsible food sourcing.
 
-## File Structure
-```
-sustainable-marketplace/
-├── config/
-│   └── database.js       # Database configuration
+---
+
+## 🚀 Features
+
+- 👤 Multi-role access: Farmers, Buyers, Delivery Agents, Admin
+- 🛒 Product Listings: Add, update, browse fresh produce
+- 🛍️ Dynamic Bidding System for Auctions
+- 🧾 Secure Order Placement & Payment System
+- 💬 Real-time Chat between Buyers and Sellers
+- 🧠 AI-driven Personalized Recommendations
+- 🔐 JWT Authentication & Role-based Access Control
+- 📊 Admin Dashboard for Monitoring & Management
+- 📦 Order Tracking with Status Updates
+
+---
+
+## 🧱 Tech Stack
+
+### 🔹 Frontend
+- React.js + Tailwind CSS
+- Axios for API integration
+- React Router & Context API
+
+### 🔹 Backend
+- Node.js with Express.js 
+- JWT for secure authentication
+- WebSocket (Socket.io) for real-time chat
+- RESTful API structure
+
+### 🔹 Databases
+- **MongoDB** – Unstructured data (chat, recommendations)
+
+### 🔹 Other Tools
+- Postman (API testing)
+
+---
+
+## 📂 Project Structure
+
+```plaintext
+backend/
 ├── controllers/
-│   ├── bidController.js  # Bid management logic
-│   ├── messageController.js # Message handling
-│   ├── orderController.js # Order processing
-│   ├── productController.js # Product operations
-│   └── userController.js # User operations
-├── middleware/
-│   └── authMiddleware.js # Authentication middleware
 ├── models/
-│   ├── Bids.js           # Bid data model
-│   ├── chat.js           # Chat model
-│   ├── Messages.js       # Message model
 ├── routes/
-│   ├── productRoutes.js  # Product-related routes
-│   └── userRoutes.js     # User-related routes
-├── test/                 # Test files
-├── package.json          # Project dependencies
-├── package-lock.json     # Lock file
-└── server.js             # Main server file
+├── middlewares/
+├── services/
+├── tests/
+├── app.js
+├── config/
+└── utils/
+
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   ├── hooks/
+│   ├── App.js
+│   └── index.js
 ```
 
-## Setup Instructions
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Configure database connection in `config/database.js`
-4. Start the server: `npm start`
 
-## Next Steps
-- Implement frontend interface
-- Add testing coverage
-- Deploy to production environment
+⚙️ Setup Instructions
+🔧 Prerequisites
+Node.js / Java (Spring Boot)
+
+PostgreSQL & MongoDB
+
+Git
+
+```
+cd backend
+npm install         # or mvn clean install for Spring Boot
+npm start           # or mvn spring-boot:run
+```
+
+Create .env file in backend:
+```
+PORT=5000
+JWT_SECRET=your_jwt_secret
+MONGO_URI=your_mongodb_uri
+POSTGRES_URL=your_postgres_connection_url
+```
+
+ Frontend Setup
+```
+cd frontend
+npm install
+npm start
+```
