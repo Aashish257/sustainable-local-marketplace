@@ -4,6 +4,8 @@ const cors = require("cors");
 const connectDB = require("./config/database");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
+
 
 const app = express();
 
@@ -17,6 +19,7 @@ connectDB();
 // Routes
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 
 // Start server
 const PORT = process.env.PORT || 6000; // Changed to a less common port
