@@ -8,6 +8,8 @@ const authRoutes = require("./routes/authRoutes");
 const paymentRoutes = require('./routes/paymentRoutes');
 // Temporarily disabled until Message model is created
 // const messageRoutes = require('./routes/messageRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+
 
 
 
@@ -28,6 +30,7 @@ app.use("/api/auth", authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/uploads', express.static('uploads'));
 app.use('/api/payments', paymentRoutes);
+app.use('/api/reviews', reviewRoutes);
 // app.use('/api/messages', messageRoutes);
 
 
