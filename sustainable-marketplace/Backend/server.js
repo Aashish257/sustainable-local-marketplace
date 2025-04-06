@@ -2,9 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/database");
-const productRoutes = require("./routes/productRoutes");
+const productRoutes = require("./routes/productRoutes_new");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/authRoutes");
+const paymentRoutes = require('./routes/paymentRoutes');
+// Temporarily disabled until Message model is created
+// const messageRoutes = require('./routes/messageRoutes');
+
+
 
 
 const app = express();
@@ -20,6 +25,11 @@ connectDB();
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/uploads', express.static('uploads'));
+app.use('/api/payments', paymentRoutes);
+// app.use('/api/messages', messageRoutes);
+
 
 // Start server
 const PORT = process.env.PORT || 6000; // Changed to a less common port
