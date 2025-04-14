@@ -6,6 +6,7 @@ import ProductDetail from './pages/ProductDetail';
 import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import PrivateRoute from "./components/PrivateRoute";
 
 export default function App() {
   return (
@@ -15,7 +16,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/admin" element={  <PrivateRoute>     <Admin />   </PrivateRoute> } />
+        
       </Routes>
       <Footer />
     </>

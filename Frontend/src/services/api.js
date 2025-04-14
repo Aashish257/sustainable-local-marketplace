@@ -7,3 +7,8 @@ const API = axios.create({
 // Products
 export const getAllProducts = () => API.get('/products');
 export const getProductById = (id) => API.get(`/products/${id}`);
+
+// Users Login
+export const loginUser = (data) => API.post('/auth/login', data);
+export const registerUser = (data) => API.post('/auth/signup', data);
+
