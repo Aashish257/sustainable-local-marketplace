@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import 'tailwindcss';
 
 export default function ProductCard({ product }) {
   return (

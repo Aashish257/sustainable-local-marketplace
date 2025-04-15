@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getAllProducts } from '../services/api';
 import ProductCard from '../components/ProductCard';
-import 'tailwindcss';
 
 export default function Products() {
   const [products, setProducts] = useState([]);

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProductById } from '../services/api';
-import 'tailwindcss';
 
 export default function ProductDetail() {
   const { id } = useParams();
