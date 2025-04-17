@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import 'tailwindcss';
 
 export default function Navbar() {
   return (
@@ -11,12 +12,24 @@ export default function Navbar() {
         </div>
 
         {/* Center: Menu Items - Always visible */}
-        <div className="flex-1 flex justify-center space-x-6 text-lg">
-          <Link to="/" className="hover:text-yellow-300 transition duration-200">Home</Link>
-          <Link to="/products" className="hover:text-yellow-300 transition duration-200">Products</Link>
-          <Link to="/admin" className="hover:text-yellow-300 transition duration-200">Admin</Link>
-          <Link to="/contact" className="hover:text-yellow-300 transition duration-200">Contact</Link>
-          <Link to="/bidding" className="hover:text-yellow-300 transition duration-200">Bidding</Link>
+        <div className="flex justify-center aligne-center gap-2 ">
+          <ul className=" list-none flex gap-2 p-4 m-6">
+            <li className="hover:text-yellow-300 transition duration-200 p-4 m-4">
+            <Link to="/" >Home</Link>
+            </li>
+            <li>
+            <Link to="/products" className="hover:text-yellow-300 transition duration-200">Products</Link>
+            </li>
+            <li>
+            <Link to="/admin" className="hover:text-yellow-300 transition duration-200">Admin</Link>
+            </li>
+            <li>
+            <Link to="/contact" className="hover:text-yellow-300 transition duration-200">Contact</Link>
+            </li>
+            <li>
+            <Link to="/bidding" className="hover:text-yellow-300 transition duration-200">Bidding</Link>
+            </li>
+          </ul>
         </div>
 
         {/* Right: Search Bar */}
