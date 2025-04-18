@@ -1,46 +1,61 @@
+import React from "react";
 import { Link } from "react-router-dom";
-import 'tailwindcss';
+import { useState } from "react";
 
-export default function Navbar() {
+const Navbar = () => {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Mock auth state
+
+  const handleAuth = () => {
+    setIsLoggedIn(!isLoggedIn);
+  };
+
+
   return (
-    <nav className="bg-green-700 text-white shadow-md px-4 py-3">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-
-        {/* Left: Logo */}
-        <div className="flex-shrink-0 text-2xl font-bold tracking-wide">
-          <Link to="/">FarmNest</Link>
+    <div className="flex-shrink-0 w-[100vw] h-[60px] flex justify-between items-center px-8 shadow-md px-[30px]">
+      <div className="w-full flex justify-between items-center mx-10">
+        {/* Logo */}
+        <div className="logo">
+          <Link to="/" className="no-underline">
+            <p className="text-2xl font-extrabold text-orange-600">
+              Thala <span className="text-blue-600">7.</span>
+            </p>
+          </Link>
         </div>
 
-        {/* Center: Menu Items - Always visible */}
-        <div className="flex justify-center aligne-center gap-2 ">
-          <ul className=" list-none flex gap-2 p-4 m-6">
-            <li className="hover:text-yellow-300 transition duration-200 p-4 m-4">
-            <Link to="/" >Home</Link>
+        {/* Menu Items */}
+        <div className="menu-item">
+          <ul className="list-none flex">
+            <li className="mx-[15px] text-gray-500 text-base cursor-pointer hover:text-orange-600 transition-colors duration-300">
+              <Link to="/">Home</Link>
             </li>
-            <li>
-            <Link to="/products" className="hover:text-yellow-300 transition duration-200">Products</Link>
+            <li className="mx-[15px] text-gray-500 text-base cursor-pointer hover:text-orange-600 transition-colors duration-300">
+              <Link to="/Admin">About</Link>
             </li>
-            <li>
-            <Link to="/admin" className="hover:text-yellow-300 transition duration-200">Admin</Link>
+            <li className="mx-[15px] text-gray-500 text-base cursor-pointer hover:text-orange-600 transition-colors duration-300">
+              <Link to="/Login">Brands</Link>
             </li>
-            <li>
-            <Link to="/contact" className="hover:text-yellow-300 transition duration-200">Contact</Link>
+            <li className="mx-[15px] text-gray-500 text-base cursor-pointer hover:text-orange-600 transition-colors duration-300">
+              <Link to="/Product">More</Link>
             </li>
-            <li>
-            <Link to="/bidding" className="hover:text-yellow-300 transition duration-200">Bidding</Link>
+            <li className="mx-[15px] text-gray-500 text-base cursor-pointer hover:text-orange-600 transition-colors duration-300">
+              <Link to="/ProductDetail">Contact</Link>
             </li>
           </ul>
         </div>
 
-        {/* Right: Search Bar */}
-        <div className="w-36 md:w-64">
-          <input
-            type="search"
-            placeholder="Search..."
-            className="w-full px-4 py-1 rounded-md text-black focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          />
+        {/* Right Nav */}
+        <div className="flex items-center gap-4">          
+        <button
+          onClick={handleAuth}
+          className="bg-orange-600 hover:bg-orange-700 text-white font-medium py-1.5 px-4 rounded transition duration-300"
+        >
+          {isLoggedIn ? "Logout" : "Login"}
+        </button>
         </div>
       </div>
-    </nav>
+    </div>
   );
-}
+};
+
+export default Navbar;
