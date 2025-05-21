@@ -1,12 +1,17 @@
-import Navbar from "../components/Navbar";
+import TopProducts from "../components/TopProducts"
 import HeroSection from "../components/HeroSection";
+import FeaturedCategories from "../components/FeaturedCategories";
+import BiddingPreview from "../components/BiddingPreview";
 
-export default function Home() {
+const Home = () => {
   return (
     <div>
-      <Navbar />
       <HeroSection />
-      {/* More components to be added: Categories, ProductGrid, etc. */}
+      <FeaturedCategories />
+      <BiddingPreview />
+      <TopProducts />
     </div>
-  );
+  )
 }
+
+export default Home;

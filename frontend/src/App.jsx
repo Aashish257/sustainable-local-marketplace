@@ -1,13 +1,28 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import { Routes, Route } from "react-router-dom"
+import Home from "./pages/Home"
+// import Products from "./pages/Products"
+// import Bidding from "./pages/Bidding"
+// import Login from "./pages/Login"
+// import Signup from "./pages/Signup"
+// import AdminDashboard from "./pages/AdminDashboard"
+import Navbar from "./components/Navbar"
+import Footer from "./components/Footer"
 
-export default function App() {
+function App() {
   return (
-    <Router>
+    <>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        
+        {/* <Route path="/products" element={<Products />} />
+        <Route path="/bidding" element={<Bidding />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} /> */}
+        {/* <Route path="/admin" element={<AdminDashboard />} /> */}
       </Routes>
-    </Router>
-  );
+      <Footer />
+    </>
+  )
 }
+
+export default App
