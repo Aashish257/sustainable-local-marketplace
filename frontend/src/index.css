@@ -3,3 +3,11 @@
 body {
   font-family: 'Inter', sans-serif;
 }
+
+.input {
+  @apply w-full p-2 mb-4 border rounded;
+}
+
+.btn {
+  @apply bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded w-full;
+}
