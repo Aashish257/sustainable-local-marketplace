@@ -1,37 +1,61 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const { login } = useAuth();
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", form);
-      login(res.data);
-      if (res.data.role === "admin") navigate("/admin/dashboard");
-      else if (res.data.role === "farmer") navigate("/farmer/dashboard");
-      else navigate("/buyer/dashboard");
-    } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
+
+    // Mock login (Replace with real API call later)
+    if (email === "buyer@example.com" && password === "password") {
+      login({ name: "Buyer", email, role: "buyer", token: "buyer123" });
+      navigate("/"); // Redirect to home or dashboard
+    } else if (email === "admin@example.com" && password === "admin") {
+      login({ name: "Admin", email, role: "admin", token: "admin123" });
+      navigate("/admin"); // Redirect to admin dashboard
+    } else {
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-green-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-4">Login</h2>
-        <input className="input" name="email" type="email" placeholder="Email" onChange={handleChange} required />
-        <input className="input" name="password" type="password" placeholder="Password" onChange={handleChange} required />
-        <button type="submit" className="btn">Login</button>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded shadow-md w-full max-w-md"
+      >
+        <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full px-3 py-2 mb-4 border border-gray-300 rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full px-3 py-2 mb-4 border border-gray-300 rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <button
+          type="submit"
+          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+        >
+          Login
+        </button>
       </form>
     </div>
   );
