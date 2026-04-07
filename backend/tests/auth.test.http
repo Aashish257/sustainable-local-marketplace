@@ -1,0 +1,76 @@
+# Auth API Test Cases
+# Base URL: http://localhost:5000
+
+### ─────────────────────────────────────────
+### TEST 1: Register — Valid Input (EXPECT: 201 success)
+### ─────────────────────────────────────────
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Aashish",
+  "email": "test@test.com",
+  "password": "123456"
+}
+
+### ─────────────────────────────────────────
+### TEST 2: Login — Correct Credentials (EXPECT: 200 + JWT token)
+### ─────────────────────────────────────────
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "123456"
+}
+
+### ─────────────────────────────────────────
+### EDGE CASE 1: Register — Duplicate Email (EXPECT: 400 error)
+### ─────────────────────────────────────────
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Aashish",
+  "email": "test@test.com",
+  "password": "123456"
+}
+
+### ─────────────────────────────────────────
+### EDGE CASE 2: Login — Wrong Password (EXPECT: 400 error)
+### ─────────────────────────────────────────
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "wrongpassword"
+}
+
+### ─────────────────────────────────────────
+### EDGE CASE 3: Register — Invalid Email Format (EXPECT: 400 validation error)
+### ─────────────────────────────────────────
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Aashish",
+  "email": "not-an-email",
+  "password": "123456"
+}
+
+### ─────────────────────────────────────────
+### EDGE CASE 4: Login — Non-existent User (EXPECT: 400 error)
+### ─────────────────────────────────────────
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ghost@nobody.com",
+  "password": "123456"
+}
+
+### ─────────────────────────────────────────
+### BONUS: Health Check (EXPECT: 200 + API running message)
+### ─────────────────────────────────────────
+GET http://localhost:5000/
