@@ -5,9 +5,9 @@ This is the backend API for the Sustainable Local Marketplace application, built
 ## Features Enforced
 
 - **Architecture:** Clean Layered Architecture (`Controller -> Service -> Repository`)
-- **Authentication:** JWT-based user authentication (Register, Login)
+- **Authentication & Authorization:** JWT-based user authentication (Register, Login) with Role-Based Access Control (RBAC)
 - **Validation:** Zod schema validation for incoming requests
-- **Security:** Passwords securely hashed with `bcrypt`, environment variables managed via `.dotenv`
+- **Security:** Passwords securely hashed with `bcrypt`, `.select("-password")` exclusion in APIs, environment variables managed via `.dotenv`
 - **Error Handling:** Centralized global error handling
 
 ## Tech Stack
@@ -35,6 +35,11 @@ backend/
 │   │       ├── auth.service.js
 │   │       ├── auth.repository.js
 │   │       └── auth.validation.js
+│   │   └── user/            
+│   │       ├── user.routes.js
+│   │       ├── user.controller.js
+│   │       ├── user.service.js
+│   │       └── user.repository.js
 │   └── utils/               # Helpers like hash.js, jwt.js
 ├── tests/                   # REST format API tests & test runner
 ├── package.json             # NPM dependencies & scripts Setup
@@ -74,6 +79,12 @@ backend/
 ### Auth Endpoints
 - `POST /api/auth/register` - Create a new user (Requires `name`, `email`, `password`)
 - `POST /api/auth/login` - Authenticate a user to get a JWT token (Requires `email`, `password`)
+
+### User Endpoints
+- `GET /api/users/me` - Get logged-in user's profile (Protected, excludes password)
+- `GET /api/users` - Get all users (Protected, Admin Only)
+
+### Global Endpoints
 - `GET /` - Health check route
 
 ## Running Tests
@@ -83,6 +94,13 @@ An automated test script using an in-memory database (`mongodb-memory-server`) i
 ```bash
 cd backend
 node tests/run-tests.js
+```
+
+### Day 2 Automated Integration tests
+Tests asserting Authorization and Role-based bounds check execution:
+```bash
+cd backend
+node tests/test-day2.js
 ```
 
 Or you can use HTTP REST Clients (like VS Code REST Client/Thunder Client/Postman) utilizing `backend/tests/auth.test.http`.
