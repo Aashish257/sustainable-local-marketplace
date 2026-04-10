@@ -15,3 +15,14 @@ export const protect = (req, res, next) => {
         next(new Error("Unauthorized"));
     }
 };
+
+export const authorize = (...roles) => {
+    return (req, res, next) => {
+        if (!req.user || !roles.includes(req.user.role)) {
+            const error = new Error("Forbidden: You do not have permission to perform this action");
+            error.status = 403; // Correct status for Forbidden access
+            return next(error);
+        }
+        next();
+    };
+};
