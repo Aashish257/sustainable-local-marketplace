@@ -1,0 +1,121 @@
+# Product Module API Test Cases
+# Base URL: http://localhost:5000
+
+@baseUrl = http://localhost:5000
+@sellerEmail = seller@test.com
+@buyerEmail = buyer@test.com
+@password = 123456
+
+### ─────────────────────────────────────────
+### SETUP: Register Seller
+### ─────────────────────────────────────────
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Seller One",
+  "email": "{{sellerEmail}}",
+  "password": "{{password}}",
+  "role": "seller"
+}
+
+### ─────────────────────────────────────────
+### SETUP: Register Buyer
+### ─────────────────────────────────────────
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Buyer One",
+  "email": "{{buyerEmail}}",
+  "password": "{{password}}",
+  "role": "buyer"
+}
+
+### ─────────────────────────────────────────
+### SETUP: Login Seller (Get Token)
+### ─────────────────────────────────────────
+# @name sellerLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{sellerEmail}}",
+  "password": "{{password}}"
+}
+
+@sellerToken = {{sellerLogin.response.body.data.token}}
+
+### ─────────────────────────────────────────
+### SETUP: Login Buyer (Get Token)
+### ─────────────────────────────────────────
+# @name buyerLogin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{buyerEmail}}",
+  "password": "{{password}}"
+}
+
+@buyerToken = {{buyerLogin.response.body.data.token}}
+
+### ─────────────────────────────────────────
+### TEST: Create Product (Seller - SUCCESS)
+### ─────────────────────────────────────────
+# @name createProduct
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{
+  "title": "Eco-friendly Bamboo Toothbrush",
+  "price": 15.99,
+  "category": "personal care",
+  "stock": 100,
+  "sustainabilityScore": 9
+}
+
+@productId = {{createProduct.response.body.data._id}}
+
+### ─────────────────────────────────────────
+### TEST: Create Product (Buyer - FAILURE)
+### ─────────────────────────────────────────
+POST {{baseUrl}}/api/products
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "title": "Illegal Product",
+  "price": 100,
+  "category": "illegal",
+  "stock": 1
+}
+
+### ─────────────────────────────────────────
+### TEST: Get All Products (Public - SUCCESS)
+### ─────────────────────────────────────────
+GET {{baseUrl}}/api/products
+
+### ─────────────────────────────────────────
+### TEST: Filtering & Pagination (Public - SUCCESS)
+### ─────────────────────────────────────────
+GET {{baseUrl}}/api/products?category=personal care&minPrice=10&maxPrice=20&page=1&limit=5
+
+### ─────────────────────────────────────────
+### TEST: Update Product (Owner - SUCCESS)
+### ─────────────────────────────────────────
+PUT {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{
+  "price": 12.99,
+  "stock": 150
+}
+
+### ─────────────────────────────────────────
+### TEST: Delete Product (Owner - SUCCESS)
+### ─────────────────────────────────────────
+DELETE {{baseUrl}}/api/products/{{productId}}
+Authorization: Bearer {{sellerToken}}
