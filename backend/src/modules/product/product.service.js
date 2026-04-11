@@ -1,7 +1,7 @@
 import {
     createProduct,
-    getProducts,
-    getProductById,
+    findProducts,
+    findProductById,
     updateProduct,
     deleteProduct,
 } from "./product.repository.js";
@@ -29,14 +29,14 @@ export const getProductsService = async (query) => {
         if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
-    return await getProducts(filter, {
+    return await findProducts(filter, {
         skip: (page - 1) * limit,
         limit: Number(limit),
     });
 };
 
 export const updateProductService = async (id, data, user) => {
-    const product = await getProductById(id);
+    const product = await findProductById(id);
 
     if (!product) throw new Error("Product not found");
 
@@ -48,7 +48,7 @@ export const updateProductService = async (id, data, user) => {
 };
 
 export const deleteProductService = async (id, user) => {
-    const product = await getProductById(id);
+    const product = await findProductById(id);
 
     if (!product) throw new Error("Product not found");
 
@@ -57,4 +57,10 @@ export const deleteProductService = async (id, user) => {
     }
 
     await deleteProduct(id);
+};
+
+export const getProductByIdService = async (id) => {
+    const product = await findProductById(id);
+    if (!product) throw new Error("Product not found");
+    return product;
 };
