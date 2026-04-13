@@ -38,7 +38,17 @@ const productSchema = new mongoose.Schema(
             min: [0, "Score minimum is 0"],
             max: [10, "Score maximum is 10"],
             default: 0
-        }
+        },
+        averageRating: {
+            type: Number,
+            default: 0,
+            min: [0, "Rating minimum is 0"],
+            max: [5, "Rating maximum is 5"]
+        },
+        totalReviews: {
+            type: Number,
+            default: 0
+        },
     },
     {
         timestamps: true
