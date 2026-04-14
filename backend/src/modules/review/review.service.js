@@ -15,22 +15,20 @@ export const createReview = async (userId, productId, reviewData) => {
         throw new Error("You can only review products you have purchased.");
     }
 
-
-    // Check for existing review explicitly for a better error message
+    // 2. DUPLICATE CHECK
     const existingReview = await Review.findOne({ userId, productId });
     if (existingReview) {
         throw new Error("You have already reviewed this product.");
     }
 
-
-    // 2. CREATE REVIEW (The unique index will catch duplicates)
+    // 3. CREATE REVIEW
     const review = await Review.create({
         userId,
         productId,
         ...reviewData
     });
 
-    // 3. ATOMIC UPDATE OF PRODUCT RATING
+    // 4. ATOMIC UPDATE OF PRODUCT RATING
     await Product.findByIdAndUpdate(
         productId,
         [
@@ -40,13 +38,12 @@ export const createReview = async (userId, productId, reviewData) => {
                         $cond: [
                             { $eq: ["$totalReviews", 0] },
                             review.rating,
-
                             {
                                 $divide: [
                                     {
                                         $add: [
                                             { $multiply: ["$averageRating", "$totalReviews"] },
-                                            reviewData.rating
+                                            review.rating
                                         ]
                                     },
                                     { $add: ["$totalReviews", 1] }
@@ -60,8 +57,12 @@ export const createReview = async (userId, productId, reviewData) => {
         ]
     );
 
-
-
-
     return review;
 };
+
+export const getReviewsByProduct = async (productId) => {
+    return await Review.find({ productId })
+        .populate("userId", "name")
+        .sort({ createdAt: -1 });
+};
+
