@@ -2,6 +2,7 @@
 import { Review } from "../../models/review.model.js";
 import { Order } from "../../models/order.model.js";
 import { Product } from "../../models/product.model.js";
+import { AppError } from "../../utils/AppError.js";
 
 export const createReview = async (userId, productId, reviewData) => {
     // 1. PURCHASE VERIFICATION
@@ -12,13 +13,13 @@ export const createReview = async (userId, productId, reviewData) => {
     });
 
     if (!hasPurchased) {
-        throw new Error("You can only review products you have purchased.");
+        throw new AppError("You can only review products you have purchased.", 403);
     }
 
     // 2. DUPLICATE CHECK
     const existingReview = await Review.findOne({ userId, productId });
     if (existingReview) {
-        throw new Error("You have already reviewed this product.");
+        throw new AppError("You have already reviewed this product.", 403);
     }
 
     // 3. CREATE REVIEW
@@ -27,6 +28,7 @@ export const createReview = async (userId, productId, reviewData) => {
         productId,
         ...reviewData
     });
+
 
     // 4. ATOMIC UPDATE OF PRODUCT RATING
     await Product.findByIdAndUpdate(

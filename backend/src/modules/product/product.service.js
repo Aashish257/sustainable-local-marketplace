@@ -5,10 +5,11 @@ import {
     updateProduct,
     deleteProduct,
 } from "./product.repository.js";
+import { AppError } from "../../utils/AppError.js";
 
 export const createProductService = async (data, user) => {
     if (user.role !== "seller") {
-        throw new Error("Only sellers can create products");
+        throw new AppError("Only sellers can create products", 403);
     }
 
     return await createProduct({
@@ -38,10 +39,10 @@ export const getProductsService = async (query) => {
 export const updateProductService = async (id, data, user) => {
     const product = await findProductById(id);
 
-    if (!product) throw new Error("Product not found");
+    if (!product) throw new AppError("Product not found", 404);
 
     if (product.sellerId.toString() !== user.id) {
-        throw new Error("Unauthorized");
+        throw new AppError("Unauthorized", 403);
     }
 
     return await updateProduct(id, data);
@@ -50,10 +51,10 @@ export const updateProductService = async (id, data, user) => {
 export const deleteProductService = async (id, user) => {
     const product = await findProductById(id);
 
-    if (!product) throw new Error("Product not found");
+    if (!product) throw new AppError("Product not found", 404);
 
     if (product.sellerId.toString() !== user.id) {
-        throw new Error("Unauthorized");
+        throw new AppError("Unauthorized", 403);
     }
 
     await deleteProduct(id);
@@ -61,6 +62,6 @@ export const deleteProductService = async (id, user) => {
 
 export const getProductByIdService = async (id) => {
     const product = await findProductById(id);
-    if (!product) throw new Error("Product not found");
+    if (!product) throw new AppError("Product not found", 404);
     return product;
-};
+};
