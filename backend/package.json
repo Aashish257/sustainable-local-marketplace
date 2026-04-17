@@ -9,14 +9,21 @@
     "dev": "nodemon src/server.js"
   },
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcrypt": "^5.1.1",
+    "bullmq": "^5.74.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
+    "express-rate-limit": "^8.3.2",
+    "helmet": "^8.1.0",
+    "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.2.4",
+    "morgan": "^1.10.1",
     "razorpay": "^2.9.6",
     "socket.io": "^4.8.3",
+    "winston": "^3.19.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

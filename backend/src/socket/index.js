@@ -1,11 +1,16 @@
 import { Server } from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
 import jwt from "jsonwebtoken";
 import chatHandler from "./chat.socket.js";
 import bidHandler from "./bid.socket.js";
+import redis from "../config/redis.js";
 
 let io;
 
 export const initSocket = (server) => {
+    const pubClient = redis;
+    const subClient = redis.duplicate();
+
     io = new Server(server, {
         cors: {
             origin: "*", 
@@ -13,7 +18,11 @@ export const initSocket = (server) => {
         }
     });
 
+    // Apply Redis Adapter for scaling (Requirement 2)
+    io.adapter(createAdapter(pubClient, subClient));
+
     // 1. SOCKET AUTH MIDDLEWARE (Requirement 2)
+
     io.use((socket, next) => {
         const token = socket.handshake.auth?.token || socket.handshake.query?.token;
 

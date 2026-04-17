@@ -1,5 +1,6 @@
 import { Message } from "../models/message.model.js";
 import User from "../models/user.model.js";
+import { addNotification } from "../config/queue.js";
 
 export default (io, socket) => {
     // 1. JOIN OWN ROOM (Requirement 3)
@@ -35,11 +36,19 @@ export default (io, socket) => {
             io.to(receiverId).emit("receive_message", newMessage);
             socket.emit("message_sent", newMessage); // Acknowledge to sender
 
+            // 1. Queue Background Job for Notification (Requirement 3)
+            await addNotification("chat_alert", {
+                senderId,
+                receiverId,
+                message: message.trim().substring(0, 50) + "..."
+            });
+
         } catch (err) {
             console.error("Chat Error:", err);
             socket.emit("chat_error", { message: "Failed to send message" });
         }
     });
+
 
     // Handle typing indicator (Optional but good signal)
     socket.on("typing", (data) => {

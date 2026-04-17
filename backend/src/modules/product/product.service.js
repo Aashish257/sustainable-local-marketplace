@@ -6,17 +6,24 @@ import {
     deleteProduct,
 } from "./product.repository.js";
 import { AppError } from "../../utils/AppError.js";
+import { invalidateCache } from "../../middleware/cache.middleware.js";
 
 export const createProductService = async (data, user) => {
     if (user.role !== "seller") {
         throw new AppError("Only sellers can create products", 403);
     }
 
-    return await createProduct({
+    const product = await createProduct({
         ...data,
         sellerId: user.id,
     });
+
+    // Invalidate product listing cache (Requirement 1)
+    await invalidateCache("cache:/api/products*");
+
+    return product;
 };
+
 
 export const getProductsService = async (query) => {
     const { page = 1, limit = 10, category, minPrice, maxPrice } = query;
@@ -45,7 +52,12 @@ export const updateProductService = async (id, data, user) => {
         throw new AppError("Unauthorized", 403);
     }
 
-    return await updateProduct(id, data);
+    const updated = await updateProduct(id, data);
+
+    // Invalidate product listing cache (Requirement 1)
+    await invalidateCache("cache:/api/products*");
+
+    return updated;
 };
 
 export const deleteProductService = async (id, user) => {
@@ -58,6 +70,9 @@ export const deleteProductService = async (id, user) => {
     }
 
     await deleteProduct(id);
+
+    // Invalidate product listing cache (Requirement 1)
+    await invalidateCache("cache:/api/products*");
 };
 
 export const getProductByIdService = async (id) => {

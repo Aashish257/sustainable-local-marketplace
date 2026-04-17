@@ -1,7 +1,9 @@
 import { Bid } from "../models/bid.model.js";
 import { Product } from "../models/product.model.js";
+import { addNotification } from "../config/queue.js";
 
 export default (io, socket) => {
+
     // 1. JOIN PRODUCT ROOM (Requirement 3)
     // Users join a specific room for the product they are watching.
     socket.on("join_product", (productId) => {
@@ -51,7 +53,15 @@ export default (io, socket) => {
                 timestamp: newBid.createdAt
             });
 
+            // 1. Queue Background Job for Notification (Requirement 3)
+            await addNotification("bid_update", {
+                productId,
+                amount: newBid.amount,
+                userId: newBid.userId
+            });
+
         } catch (err) {
+
             console.error("Bidding Error:", err);
             socket.emit("bid_error", { message: "Failed to place bid" });
         }
