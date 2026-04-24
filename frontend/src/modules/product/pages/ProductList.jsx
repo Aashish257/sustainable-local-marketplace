@@ -43,10 +43,10 @@ const ProductList = () => {
                 {/* Main content area for grid */}
                 <main className="w-full lg:w-3/4">
                     {/* The Grid */}
-                    <ProductGrid products={data?.data?.products} isLoading={isLoading} />
+                    <ProductGrid products={data?.data} isLoading={isLoading} />
 
                     {/* Pagination Controls */}
-                    {data?.data?.pagination && (
+                    {data?.pagination && (
                         <div className="flex justify-center items-center mt-8 gap-4">
                             <button
                                 onClick={handlePrevPage}
