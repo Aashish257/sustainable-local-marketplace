@@ -24,3 +24,12 @@ export const REVIEWS = {
     GET_BY_PRODUCT: "/reviews/product/:productId",
     GET_BY_USER: "/reviews/user/:userId",
 }
+
+export const ORDERS = {
+    CREATE: "/orders",
+}
+
+export const PAYMENTS = {
+    CREATE: "/payments/create",
+    VERIFY: "/payments/verify",
+}

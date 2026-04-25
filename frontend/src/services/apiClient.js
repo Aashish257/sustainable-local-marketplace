@@ -11,9 +11,16 @@ const apiClient = axios.create({
 
 // Request Interceptor
 apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    const storage = localStorage.getItem("auth-storage");
+    if (storage) {
+        try {
+            const { state } = JSON.parse(storage);
+            if (state && state.token) {
+                config.headers.Authorization = `Bearer ${state.token}`;
+            }
+        } catch (e) {
+            console.error("Failed to parse auth token", e);
+        }
     }
     return config;
 });
@@ -23,7 +30,7 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem("token");
+            localStorage.removeItem("auth-storage"); // Clean Zustand store
             window.location.href = "/login";
         }
         return Promise.reject(error);
