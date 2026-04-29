@@ -43,9 +43,13 @@ export const cacheMiddleware = (ttl = 60) => {
  * @param {string} pattern - key pattern to delete (e.g., "cache:/api/products*")
  */
 export const invalidateCache = async (pattern) => {
-    const keys = await redis.keys(pattern);
-    if (keys.length > 0) {
-        await redis.del(...keys);
-        console.log(`🧹 Cache Invalidated: ${pattern} (${keys.length} keys)`);
+    try {
+        const keys = await redis.keys(pattern);
+        if (keys.length > 0) {
+            await redis.del(...keys);
+            console.log(`🧹 Cache Invalidated: ${pattern} (${keys.length} keys)`);
+        }
+    } catch (err) {
+        console.error("❌ Cache Invalidation Error:", err);
     }
 };

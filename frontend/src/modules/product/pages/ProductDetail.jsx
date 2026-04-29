@@ -4,6 +4,7 @@ import ProductGallery from '../components/ProductGallery';
 import ProductInfo from '../components/ProductInfo';
 import AddToCart from '../components/AddToCart';
 import ReviewList from '../../review/components/ReviewList';
+import ReviewForm from '../../review/components/ReviewForm';
 
 
 const ProductDetail = () => {
@@ -40,7 +41,7 @@ const ProductDetail = () => {
 
             {/* BOTTOM SECTION: Reviews */}
             <div className="border-t pt-10">
-                <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+                <ReviewForm productId={product._id} />
                 <ReviewList productId={product._id} />
             </div>
         </div>

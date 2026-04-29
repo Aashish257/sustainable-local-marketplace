@@ -16,13 +16,8 @@ export const PRODUCTS = {
 }
 
 export const REVIEWS = {
-    GET_ALL: "/reviews",
     ADD: "/reviews",
-    UPDATE: "/reviews/:id",
-    DELETE: "/reviews/:id",
-    GET_ONE: "/reviews/:id",
-    GET_BY_PRODUCT: "/reviews/product/:productId",
-    GET_BY_USER: "/reviews/user/:userId",
+    GET_BY_PRODUCT: "/reviews/:productId",
 }
 
 export const ORDERS = {

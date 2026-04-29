@@ -1,9 +1,17 @@
+import StarRating from '../../review/components/StarRating';
+
 const ProductInfo = ({ product }) => {
     return (
         <div className="flex flex-col">
             <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
-
-            {/* Category & Sustainability Score */}
+            
+            {/* Rating Summary */}
+            <div className="flex items-center gap-3 mb-4">
+                <StarRating rating={product.averageRating} readOnly size="sm" />
+                <span className="text-sm font-medium text-gray-500 hover:text-green-600 cursor-pointer">
+                    ({product.totalReviews || 0} reviews)
+                </span>
+            </div>
             <div className="flex items-center gap-4 mb-6">
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                     {product.category}

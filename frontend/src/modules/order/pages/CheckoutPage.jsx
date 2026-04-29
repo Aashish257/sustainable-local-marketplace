@@ -29,15 +29,17 @@ const CheckoutPage = () => {
                 ...(token ? { 'Authorization': `Bearer ${token}` } : {})
             };
 
+            const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
             // 1. Fetch current backend cart
-            const cartRes = await fetch('http://localhost:5000/api/cart', { headers });
+            const cartRes = await fetch(`${API_BASE}/cart`, { headers });
             if (cartRes.ok) {
                 const backendCart = await cartRes.json();
                 // 2. Clear backend cart so we don't duplicate quantities
                 for (const item of backendCart.data?.items || []) {
                     // backend populates productId, so we need item.productId._id
                     const idToRemove = item.productId?._id || item.productId;
-                    await fetch(`http://localhost:5000/api/cart/${idToRemove}`, {
+                    await fetch(`${API_BASE}/cart/${idToRemove}`, {
                         method: 'DELETE',
                         headers
                     });
@@ -46,7 +48,7 @@ const CheckoutPage = () => {
 
             // 3. Sync Zustand cart to backend
             for (const item of cart) {
-                await fetch('http://localhost:5000/api/cart', {
+                await fetch(`${API_BASE}/cart`, {
                     method: 'POST',
                     headers,
                     body: JSON.stringify({

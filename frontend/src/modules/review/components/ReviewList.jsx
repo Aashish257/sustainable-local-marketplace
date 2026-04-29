@@ -1,55 +1,47 @@
-import { useProductReviews } from '../services/reviewQueries';
+import React from 'react';
+import { useGetReviews } from '../services/reviewQueries';
+import ReviewItem from './ReviewItem';
 
 const ReviewList = ({ productId }) => {
-    // 1. Fetch the reviews!
-    const { data, isLoading, isError } = useProductReviews(productId);
+    const { data: reviewsData, isLoading, isError } = useGetReviews(productId);
 
-    // 2. Loading Skeleton (Task 9 Requirement)
     if (isLoading) {
         return (
-            <div className="animate-pulse space-y-4">
-                {[1, 2, 3].map(i => (
-                    <div key={i} className="bg-gray-100 h-24 rounded-lg w-full"></div>
+            <div className="space-y-4 animate-pulse">
+                {[1, 2].map(i => (
+                    <div key={i} className="h-32 bg-gray-50 rounded-xl"></div>
                 ))}
             </div>
         );
     }
 
-    if (isError) return <div className="text-red-500">Failed to load reviews.</div>;
+    if (isError) {
+        return <p className="text-red-500 text-center py-4">Failed to load reviews.</p>;
+    }
 
-    // The backend usually returns the array in data.data
-    const reviews = data?.data || [];
+    const reviews = reviewsData?.data || [];
 
-    // 3. Empty State Handling
     if (reviews.length === 0) {
         return (
-            <div className="text-gray-500 italic py-8">
-                No reviews yet. Be the first to review this product!
+            <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                <p className="text-gray-400 font-medium">No reviews yet. Be the first to share your thoughts!</p>
             </div>
         );
     }
 
-    // 4. Render the Reviews
     return (
-        <div className="space-y-6">
-            {reviews.map((review) => (
-                <div key={review._id} className="border-b pb-6 border-gray-100">
-                    <div className="flex items-center gap-4 mb-2">
-                        {/* Avatar Circle */}
-                        <div className="bg-green-100 text-green-800 font-bold rounded-full w-10 h-10 flex items-center justify-center uppercase">
-                            {review.user?.name?.charAt(0) || 'U'}
-                        </div>
-                        <div>
-                            <p className="font-semibold text-gray-800">{review.user?.name || 'Anonymous User'}</p>
-                            {/* Star Rating Logic */}
-                            <div className="flex text-yellow-400 text-sm tracking-widest">
-                                {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
-                            </div>
-                        </div>
-                    </div>
-                    <p className="text-gray-600 mt-2">{review.comment}</p>
-                </div>
-            ))}
+        <div className="mt-8">
+            <h3 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-3">
+                Customer Feedback 
+                <span className="text-sm font-normal text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+                    {reviews.length}
+                </span>
+            </h3>
+            <div className="space-y-4">
+                {reviews.map((review) => (
+                    <ReviewItem key={review._id} review={review} />
+                ))}
+            </div>
         </div>
     );
 };

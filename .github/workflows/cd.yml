@@ -1,0 +1,74 @@
+name: CD — Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Build, Push & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ─────────────────────────────────────────────
+      # Step 1: Log in to Docker Hub
+      # ─────────────────────────────────────────────
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # ─────────────────────────────────────────────
+      # Step 2: Set up Docker Buildx (for multi-platform)
+      # ─────────────────────────────────────────────
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ─────────────────────────────────────────────
+      # Step 3: Build and push backend image
+      # ─────────────────────────────────────────────
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/sustainable-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/sustainable-backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ─────────────────────────────────────────────
+      # Step 4: Deploy to VPS via SSH
+      # (Comment this out if using Render — Render auto-deploys from GitHub)
+      # ─────────────────────────────────────────────
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd /opt/sustainable-marketplace
+            echo "📦 Pulling latest image..."
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sustainable-backend:latest
+            echo "🔄 Restarting app container..."
+            docker-compose up -d --no-deps app
+            echo "🧹 Cleaning up old images..."
+            docker image prune -f
+            echo "✅ Deployment complete! $(date)"
+
+      # ─────────────────────────────────────────────
+      # Step 5: Notify on success
+      # ─────────────────────────────────────────────
+      - name: Deployment Summary
+        if: success()
+        run: |
+          echo "🚀 Deployment succeeded!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Triggered by: ${{ github.actor }}"
