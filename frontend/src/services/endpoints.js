@@ -28,3 +28,11 @@ export const PAYMENTS = {
     CREATE: "/payments/create",
     VERIFY: "/payments/verify",
 }
+
+export const MESSAGES = {
+    GET_HISTORY: "/messages/:receiverId",
+}
+
+export const BIDS = {
+    GET_HIGHEST: "/bids/:productId",
+}

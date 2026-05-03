@@ -19,7 +19,7 @@ export const findProducts = async (query, { skip = 0, limit = 10, sort = { creat
 };
 
 export const findProductById = async (id) => {
-    return await Product.findById(id);
+    return await Product.findById(id).populate("sellerId", "name email");
 };
 
 export const updateProduct = async (id, data) => {

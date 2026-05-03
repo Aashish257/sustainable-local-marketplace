@@ -14,6 +14,8 @@ import cartRoutes from "./modules/cart/cart.routes.js";
 import orderRoutes from "./modules/order/order.routes.js";
 import paymentRoutes from "./modules/payment/payment.routes.js";
 import reviewRoutes from "./modules/review/review.routes.js";
+import messageRoutes from "./modules/message/message.routes.js";
+import bidRoutes from "./modules/bid/bid.routes.js";
 
 const app = express();
 
@@ -53,6 +55,8 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/bids", bidRoutes);
 
 app.use(errorHandler);
 
