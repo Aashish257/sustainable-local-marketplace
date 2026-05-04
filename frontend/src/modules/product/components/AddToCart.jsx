@@ -1,16 +1,12 @@
 import { useCartStore } from '../../cart/store/cartStore';
+import toast from 'react-hot-toast';
 
 const AddToCart = ({ product }) => {
-    // 1. Grab the addToCart function from our Zustand store
     const addToCart = useCartStore((state) => state.addToCart);
 
-    // 2. Click handler
     const handleAdd = () => {
         addToCart(product);
-
-        // Let's use a simple browser alert for feedback right now.
-        // We can upgrade this to a nice Toast notification later!
-        alert(`Added "${product.title}" to cart!`);
+        toast.success(`🛒 "${product.title}" added to cart!`);
     };
 
     // 3. Safety check: Don't show the button if out of stock

@@ -12,6 +12,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/", cacheMiddleware(60), productController.getProducts);
+router.get("/mine", protect, authorize("seller"), productController.getMyProducts);
 router.get("/:id", productController.getProductById);
 
 

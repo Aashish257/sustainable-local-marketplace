@@ -1,7 +1,8 @@
 import ProductCard from './ProductCard';
+import { SkeletonGrid } from '../../../shared/components/SkeletonLoader';
 
 const ProductGrid = ({ products, isLoading }) => {
-    if (isLoading) return <div className="text-center py-10">Loading products...</div>;
+    if (isLoading) return <SkeletonGrid count={8} />;
 
     // Safety check in case products array is empty or undefined
     if (!products || products.length === 0) {

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCreatePayment, useVerifyPayment } from '../services/paymentQueries';
 import { useCartStore } from '../../cart/store/cartStore';
+import toast from 'react-hot-toast';
 
 const PaymentPage = () => {
     const { orderId } = useParams();
@@ -40,7 +41,7 @@ const PaymentPage = () => {
                                 clearCart(); // Task 6 Rule
                                 navigate('/success'); // Task 6 Rule
                             },
-                            onError: () => alert("Payment Verification Failed. Please contact support.")
+                            onError: () => toast.error("Payment verification failed. Please contact support.")
                         });
                     },
                     theme: { color: "#16a34a" } // Tailwind green-600
@@ -48,11 +49,11 @@ const PaymentPage = () => {
 
                 const rzp = new window.Razorpay(options);
                 rzp.on('payment.failed', function (response) {
-                    alert("Payment Failed! Please try again.");
+                    toast.error("Payment failed. Please try again.");
                 });
                 rzp.open();
             },
-            onError: () => alert("Failed to initialize payment. Please try again.")
+            onError: () => toast.error("Failed to initialize payment. Please try again.")
         });
     };
 

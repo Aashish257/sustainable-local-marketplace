@@ -36,6 +36,13 @@ export default (io, socket) => {
             io.to(receiverId).emit("receive_message", newMessage);
             socket.emit("message_sent", newMessage); // Acknowledge to sender
 
+            // Real-time notification to receiver
+            io.to(receiverId).emit("notification", {
+                type: "chat",
+                message: `💬 New message from ${socket.user.name || "someone"}`,
+                link: "/"
+            });
+
             // 1. Queue Background Job for Notification (Requirement 3)
             await addNotification("chat_alert", {
                 senderId,

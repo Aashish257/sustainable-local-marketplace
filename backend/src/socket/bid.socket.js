@@ -45,12 +45,18 @@ export default (io, socket) => {
             });
 
             // E. Broadcast: Notify everyone in the product room (Requirement 5)
-            // We use io.to() to ensure every connected user in this room gets the update.
             io.to(`product:${productId}`).emit("new_bid", {
                 productId,
                 amount: newBid.amount,
                 userId: newBid.userId,
                 timestamp: newBid.createdAt
+            });
+
+            // Real-time notification to all watchers
+            io.to(`product:${productId}`).emit("notification", {
+                type: "bid",
+                message: `🔨 New bid of ₹${newBid.amount} placed!`,
+                link: `/products/${productId}`
             });
 
             // 1. Queue Background Job for Notification (Requirement 3)

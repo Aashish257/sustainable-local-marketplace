@@ -8,16 +8,16 @@ import ReviewForm from '../../review/components/ReviewForm';
 import BidPanel from '../../bid/components/BidPanel';
 import ChatBox from '../../chat/components/ChatBox';
 import useAuthStore from '../../../store/authStore';
+import { SkeletonDetail } from '../../../shared/components/SkeletonLoader';
 
 
 const ProductDetail = () => {
     const { id } = useParams();
     const { user } = useAuthStore();
 
-    // Fetch the product data!
     const { data, isLoading, isError } = useProduct(id);
 
-    if (isLoading) return <div className="text-center py-20">Loading Product...</div>;
+    if (isLoading) return <SkeletonDetail />;
     if (isError || !data?.data) return <div className="text-center py-20 text-red-500">Product not found</div>;
 
     const product = data.data;

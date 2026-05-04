@@ -14,17 +14,18 @@ export const useProducts = (filters) => {
         queryKey: ['products', filters],
         queryFn: () => getProducts(filters),
         placeholderData: (previousData) => previousData,
+        staleTime: 2 * 60 * 1000, // 2 minutes
     });
 };
 
 // 2. Custom Hook for Fetching a Single Product
 export const useProduct = (id) => {
-    // This hook only runs when the 'id' changes.
     return useQuery({
         queryKey: ['product', id],
         queryFn: () => getProductById(id),
-        enabled: !!id, // Only run this query if we have an ID
+        enabled: !!id,
         placeholderData: (previousData) => previousData,
+        staleTime: 5 * 60 * 1000, // 5 minutes
     });
 };
 

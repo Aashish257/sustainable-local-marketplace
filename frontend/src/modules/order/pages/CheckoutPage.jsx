@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../cart/store/cartStore';
 import { useCreateOrder } from '../services/orderQueries';
+import toast from 'react-hot-toast';
 
 const CheckoutPage = () => {
     const navigate = useNavigate();
@@ -62,7 +63,7 @@ const CheckoutPage = () => {
             createOrder({}, {
                 onSuccess: (data) => {
                     setIsSyncing(false);
-                    alert("Order Created! Proceeding to Payment...");
+                    toast.success("Order created! Redirecting to payment...");
                     navigate(`/payment/${data.data._id}`);
                 },
                 onError: (err) => {
@@ -73,7 +74,7 @@ const CheckoutPage = () => {
         } catch (error) {
             setIsSyncing(false);
             console.error("Cart sync failed", error);
-            alert("Failed to sync cart with server.");
+            toast.error("Failed to sync cart with server.");
         }
     };
 

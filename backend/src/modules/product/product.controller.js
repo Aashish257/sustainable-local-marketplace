@@ -61,3 +61,14 @@ export const deleteProduct = async (req, res, next) => {
         next(err);
     }
 };
+
+// GET /api/products/mine — Seller dashboard: get own products
+export const getMyProducts = async (req, res, next) => {
+    try {
+        const { Product } = await import("../../models/product.model.js");
+        const products = await Product.find({ sellerId: req.user.id }).sort({ createdAt: -1 });
+        res.json({ success: true, data: products });
+    } catch (err) {
+        next(err);
+    }
+};
