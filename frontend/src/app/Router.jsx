@@ -11,6 +11,8 @@ import PaymentPage from "../modules/payment/pages/PaymentPage";
 import SuccessPage from "../modules/payment/pages/SuccessPage";
 import { SkeletonGrid } from "../shared/components/SkeletonLoader";
 
+import GuestRoute from "../shared/layout/GuestRoute";
+
 // Lazy loaded — Dashboard is only downloaded when user visits /dashboard
 const DashboardLayout = lazy(() => import("../modules/dashboard/layout/DashboardLayout"));
 const DashboardHome = lazy(() => import("../modules/dashboard/pages/DashboardHome"));
@@ -22,8 +24,11 @@ const Router = () => {
     return (
         <Suspense fallback={<div className="container mx-auto px-4 py-12"><SkeletonGrid count={4} /></div>}>
             <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
+                {/* Guest Routes (Only accessible if NOT logged in) */}
+                <Route element={<GuestRoute />}>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/register" element={<RegisterPage />} />
+                </Route>
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>

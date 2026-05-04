@@ -123,12 +123,17 @@ const Navbar = () => {
 
                     {/* Auth Actions */}
                     {token ? (
-                        <button
-                            onClick={handleLogout}
-                            className="text-sm bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 px-4 py-2 rounded-lg font-medium transition-all"
-                        >
-                            Logout
-                        </button>
+                        <div className="flex items-center gap-3 ml-2 border-l border-gray-200 pl-4">
+                            <span className="text-sm font-medium text-gray-700 hidden md:block">
+                                Welcome, {user?.name || 'User'}
+                            </span>
+                            <button
+                                onClick={handleLogout}
+                                className="text-sm bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 px-4 py-2 rounded-lg font-medium transition-all"
+                            >
+                                Logout
+                            </button>
+                        </div>
                     ) : (
                         <div className="flex items-center gap-2">
                             <Link to="/login" className="text-sm text-gray-600 hover:text-green-600 font-medium transition-colors">
