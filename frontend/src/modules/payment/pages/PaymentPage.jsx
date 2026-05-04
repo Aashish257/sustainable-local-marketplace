@@ -24,7 +24,7 @@ const PaymentPage = () => {
         createPayment(orderId, {
             onSuccess: (res) => {
                 const options = {
-                    key: res.data.key || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_dummy", // Razorpay requires a key!
+                    key: import.meta.env.VITE_RAZORPAY_KEY_ID || res.data.key || "rzp_test_dummy", // Prioritize env var over backend or dummy
                     amount: res.data.amount,
                     currency: res.data.currency,
                     name: "Sustainable Marketplace",

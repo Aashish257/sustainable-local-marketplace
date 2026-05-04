@@ -15,7 +15,7 @@ const LoginPage = () => {
     const mutation = useMutation({
         mutationFn: loginUser,
         onSuccess: (data) => {
-            login(null, data.data.token)  // save to store
+            login(data.data.user, data.data.token)  // save to store
             navigate('/')                   // redirect
         }
     })

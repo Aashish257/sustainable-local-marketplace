@@ -23,6 +23,7 @@ export const REVIEWS = {
 export const ORDERS = {
     CREATE: "/orders",
     MY: "/orders/my",
+    SELLER: "/orders/seller",
 }
 
 export const PRODUCTS_MINE = "/products/mine";

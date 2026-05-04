@@ -32,5 +32,13 @@ export const loginService = async ({ email, password }) => {
         role: user.role,
     });
 
-    return { token };
+    return { 
+        token, 
+        user: { 
+            id: user._id, 
+            name: user.name, 
+            email: user.email, 
+            role: user.role 
+        } 
+    };
 };

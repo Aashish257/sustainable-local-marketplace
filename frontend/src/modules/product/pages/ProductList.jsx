@@ -21,7 +21,7 @@ const ProductList = () => {
     };
 
     const handlePrevPage = () => {
-        setFilters.apply((prev) => ({
+        setFilters((prev) => ({
             ...prev, page: Math.max(1, prev.page - 1)
         }));
     };

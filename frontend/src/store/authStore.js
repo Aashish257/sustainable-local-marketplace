@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { connectSocket, disconnectSocket } from "../services/socket";
+import { useCartStore } from "../modules/cart/store/cartStore";
+import useNotificationStore from "./notificationStore";
 
 const useAuthStore = create(
     persist((set) => ({
@@ -13,6 +15,11 @@ const useAuthStore = create(
         },
         logout: () => {
             disconnectSocket(); // Clean disconnect on logout
+            
+            // Clear other stores
+            useCartStore.getState().clearCart();
+            useNotificationStore.getState().clearAll();
+            
             set({ user: null, token: null, isAuthenticated: false });
         },
     }), {

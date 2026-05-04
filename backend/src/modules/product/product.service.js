@@ -26,9 +26,16 @@ export const createProductService = async (data, user) => {
 
 
 export const getProductsService = async (query) => {
-    const { page = 1, limit = 10, category, minPrice, maxPrice } = query;
+    const { page = 1, limit = 10, category, minPrice, maxPrice, search } = query;
 
     const filter = {};
+
+    if (search) {
+        filter.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } }
+        ];
+    }
 
     if (category) filter.category = category;
     if (minPrice || maxPrice) {

@@ -25,8 +25,8 @@ const DashboardHome = () => {
     });
 
     const { data: ordersData } = useQuery({
-        queryKey: ['my-orders'],
-        queryFn: () => apiClient.get(ORDERS.MY).then(r => r.data),
+        queryKey: ['seller-orders'],
+        queryFn: () => apiClient.get(ORDERS.SELLER).then(r => r.data),
         staleTime: 5 * 60 * 1000,
     });
 
