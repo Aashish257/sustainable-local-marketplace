@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
-import apiClient from '../../../services/apiClient';
-import { PRODUCTS } from '../../../services/endpoints';
-import { SkeletonGrid } from '../../../shared/components/SkeletonLoader';
+import apiClient from '../../services/apiClient';
+import { PRODUCTS } from '../../services/endpoints';
+import { SkeletonGrid } from '../../shared/components/SkeletonLoader';
 
 const HomePage = () => {
     const navigate = useNavigate();

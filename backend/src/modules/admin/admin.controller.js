@@ -1,6 +1,6 @@
 import User from "../../models/user.model.js";
 import { Product } from "../../models/product.model.js";
-import { Order } from "../order/order.model.js";
+import { Order } from "../../models/order.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 
 export const getSystemStats = asyncHandler(async (req, res) => {
