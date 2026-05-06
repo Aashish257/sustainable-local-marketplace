@@ -40,3 +40,10 @@ export const MESSAGES = {
 export const BIDS = {
     GET_HIGHEST: "/bids/:productId",
 }
+
+export const ADMIN = {
+    STATS: "/admin/stats",
+    USERS: "/admin/users",
+    PRODUCTS: "/admin/products",
+    ORDERS: "/admin/orders",
+}

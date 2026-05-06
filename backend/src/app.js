@@ -16,6 +16,7 @@ import paymentRoutes from "./modules/payment/payment.routes.js";
 import reviewRoutes from "./modules/review/review.routes.js";
 import messageRoutes from "./modules/message/message.routes.js";
 import bidRoutes from "./modules/bid/bid.routes.js";
+import adminRoutes from "./modules/admin/admin.routes.js";
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/bids", bidRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use(errorHandler);
 

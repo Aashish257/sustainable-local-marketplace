@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 import { Product } from "../models/product.model.js";
+import User from "../models/user.model.js";
 
 // Load environment variables based on the path
 dotenv.config({ path: "../../.env" });
@@ -97,19 +99,33 @@ const seedDatabase = async () => {
         await mongoose.connect(uri);
         console.log("✅ Connected to database.");
 
-        // Clean existing products (optional, but good for a fresh start)
-        console.log("🧹 Clearing existing products...");
+        // Clean existing collections
+        console.log("🧹 Clearing existing collections...");
         await Product.deleteMany({});
+        await User.deleteMany({});
         
-        // Let's create a dummy seller ID since products require a sellerId
-        // In a real scenario, this would reference an actual User document.
-        // We'll use a valid ObjectId string.
-        const dummySellerId = new mongoose.Types.ObjectId();
+        console.log("👤 Creating seed users...");
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash("password123", salt);
+
+        const adminUser = await User.create({
+            name: "Super Admin",
+            email: "admin@sustain.com",
+            password: hashedPassword,
+            role: "admin"
+        });
+
+        const sellerUser = await User.create({
+            name: "Demo Seller",
+            email: "seller@sustain.com",
+            password: hashedPassword,
+            role: "seller"
+        });
 
         console.log("📦 Inserting new products...");
         const productsWithSeller = seedProducts.map(p => ({
             ...p,
-            sellerId: dummySellerId
+            sellerId: sellerUser._id
         }));
 
         await Product.insertMany(productsWithSeller);

@@ -23,6 +23,13 @@ const EditProduct = lazy(() => import("../modules/dashboard/pages/EditProduct"))
 const SellerOrders = lazy(() => import("../modules/dashboard/pages/SellerOrders"));
 const Analytics = lazy(() => import("../modules/dashboard/pages/Analytics"));
 
+// Admin
+const AdminLayout = lazy(() => import("../modules/admin/layout/AdminLayout"));
+const AdminDashboard = lazy(() => import("../modules/admin/pages/AdminDashboard"));
+const AdminUsers = lazy(() => import("../modules/admin/pages/AdminUsers"));
+const AdminProducts = lazy(() => import("../modules/admin/pages/AdminProducts"));
+const AdminOrders = lazy(() => import("../modules/admin/pages/AdminOrders"));
+
 const Router = () => {
     return (
         <Suspense fallback={<div className="container mx-auto px-4 py-12"><SkeletonGrid count={4} /></div>}>
@@ -47,6 +54,14 @@ const Router = () => {
                         <Route path="products/edit/:id" element={<EditProduct />} />
                         <Route path="orders" element={<SellerOrders />} />
                         <Route path="analytics" element={<Analytics />} />
+                    </Route>
+
+                    {/* Admin Panel (RBAC inside AdminLayout) */}
+                    <Route path="/admin" element={<AdminLayout />}>
+                        <Route index element={<AdminDashboard />} />
+                        <Route path="users" element={<AdminUsers />} />
+                        <Route path="products" element={<AdminProducts />} />
+                        <Route path="orders" element={<AdminOrders />} />
                     </Route>
                 </Route>
 

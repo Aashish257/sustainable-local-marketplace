@@ -64,6 +64,12 @@ const Navbar = () => {
                         </Link>
                     )}
 
+                    {token && user?.role === 'admin' && (
+                        <Link to="/admin" className="text-purple-600 hover:text-purple-800 text-sm font-bold transition-colors hidden md:block bg-purple-50 px-3 py-1 rounded-lg">
+                            Admin Panel
+                        </Link>
+                    )}
+
                     {/* Notification Bell */}
                     {token && (
                         <div className="relative" ref={bellRef}>
