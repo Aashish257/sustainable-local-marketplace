@@ -17,13 +17,12 @@ const ProductDetail = () => {
     const { user } = useAuthStore();
 
     const { data, isLoading, isError } = useProduct(id);
+    const [isChatOpen, setIsChatOpen] = useState(false);
 
     if (isLoading) return <SkeletonDetail />;
     if (isError || !data?.data) return <div className="text-center py-20 text-red-500">Product not found</div>;
 
     const product = data.data;
-
-    const [isChatOpen, setIsChatOpen] = useState(false);
 
     // Seller ID from product — used for the ChatBox
     const sellerId = product.sellerId?._id || product.sellerId;
