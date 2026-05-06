@@ -18,6 +18,7 @@ import GuestRoute from "../shared/layout/GuestRoute";
 const DashboardLayout = lazy(() => import("../modules/dashboard/layout/DashboardLayout"));
 const DashboardHome = lazy(() => import("../modules/dashboard/pages/DashboardHome"));
 const SellerProducts = lazy(() => import("../modules/dashboard/pages/SellerProducts"));
+const AddProduct = lazy(() => import("../modules/dashboard/pages/AddProduct"));
 const SellerOrders = lazy(() => import("../modules/dashboard/pages/SellerOrders"));
 const Analytics = lazy(() => import("../modules/dashboard/pages/Analytics"));
 
@@ -41,6 +42,7 @@ const Router = () => {
                     <Route path="/dashboard" element={<DashboardLayout />}>
                         <Route index element={<DashboardHome />} />
                         <Route path="products" element={<SellerProducts />} />
+                        <Route path="products/add" element={<AddProduct />} />
                         <Route path="orders" element={<SellerOrders />} />
                         <Route path="analytics" element={<Analytics />} />
                     </Route>

@@ -33,6 +33,12 @@ const SellerProducts = () => {
         <div>
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold text-gray-800">My Products</h1>
+                <Link 
+                    to="/dashboard/products/add" 
+                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2 shadow-sm"
+                >
+                    <span className="text-xl leading-none">+</span> Add Product
+                </Link>
             </div>
 
             {isLoading ? (
@@ -40,8 +46,16 @@ const SellerProducts = () => {
                     {[1, 2, 3].map(i => <div key={i} className="h-20 bg-gray-100 rounded-xl animate-pulse" />)}
                 </div>
             ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50 rounded-2xl">
-                    <p className="text-gray-400 text-lg">No products yet. Add your first product!</p>
+                <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
+                    <span className="text-4xl mb-4 block">📦</span>
+                    <h3 className="text-xl font-bold text-gray-700 mb-2">No products yet</h3>
+                    <p className="text-gray-500 mb-6">List your first sustainable product to start selling!</p>
+                    <Link 
+                        to="/dashboard/products/add"
+                        className="inline-block bg-green-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                        Add Your First Product
+                    </Link>
                 </div>
             ) : (
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
