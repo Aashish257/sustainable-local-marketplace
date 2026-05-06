@@ -11,11 +11,11 @@ const ProductGallery = ({ images, title }) => {
     return (
         <div className="w-full">
             {/* Main Image */}
-            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+            <div className="aspect-square bg-slate-100 rounded-3xl overflow-hidden mb-6 soft-shadow border border-slate-100 group relative">
                 <img
                     src={images[0]}
                     alt={title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
             </div>
 

@@ -42,7 +42,7 @@ const Navbar = () => {
     const unreadCount = getUnreadCount();
 
     return (
-        <nav className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
+        <nav className="glass sticky top-0 z-50 transition-all duration-300">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/products" className="flex items-center gap-2 text-green-700 font-extrabold text-xl">

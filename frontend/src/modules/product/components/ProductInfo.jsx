@@ -3,37 +3,38 @@ import StarRating from '../../review/components/StarRating';
 const ProductInfo = ({ product }) => {
     return (
         <div className="flex flex-col">
-            <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
+            <h1 className="text-4xl font-black mb-3 text-slate-800 tracking-tight leading-tight">{product.title}</h1>
             
             {/* Rating Summary */}
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-3 mb-6">
                 <StarRating rating={product.averageRating} readOnly size="sm" />
-                <span className="text-sm font-medium text-gray-500 hover:text-green-600 cursor-pointer">
+                <span className="text-sm font-bold text-slate-400 hover:text-emerald-600 cursor-pointer transition-colors">
                     ({product.totalReviews || 0} reviews)
                 </span>
             </div>
-            <div className="flex items-center gap-4 mb-6">
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+            <div className="flex flex-wrap items-center gap-3 mb-8">
+                <span className="bg-slate-50 text-slate-600 border border-slate-200 px-4 py-1.5 rounded-xl text-sm font-bold tracking-wide">
                     {product.category}
                 </span>
                 {product.sustainabilityScore && (
-                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-4 py-1.5 rounded-xl text-sm font-bold flex items-center gap-1.5 tracking-wide shadow-sm">
                         🌱 Score: {product.sustainabilityScore}/10
                     </span>
                 )}
             </div>
 
-            <p className="text-3xl font-bold text-green-600 mb-6">${product.price}</p>
+            <p className="text-4xl font-black text-slate-900 mb-8">₹{product.price}</p>
 
-            <div className="prose max-w-none text-gray-700 mb-8">
-                <h3 className="text-lg font-semibold mb-2">Description</h3>
-                <p className="whitespace-pre-wrap">{product.description}</p>
+            <div className="prose max-w-none text-slate-600 mb-8 font-medium leading-relaxed">
+                <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3">Description</h3>
+                <p className="whitespace-pre-wrap text-lg">{product.description}</p>
             </div>
 
             {/* If you have stock info in your schema, show it here */}
             {product.stock !== undefined && (
-                <p className={`text-sm font-medium mb-6 ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                <p className={`text-sm font-bold mb-6 flex items-center gap-2 ${product.stock > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                    <span className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></span>
+                    {product.stock > 0 ? `${product.stock} in stock - Ready to ship` : 'Currently out of stock'}
                 </p>
             )}
         </div>

@@ -43,16 +43,16 @@ const ProductDetail = () => {
                 </div>
 
                 {/* RIGHT: Product Info + Add to Cart */}
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-6 bg-white p-8 rounded-3xl soft-shadow border border-slate-100">
                     <ProductInfo product={product} />
-                    <div className="mt-auto flex flex-col gap-4">
+                    <div className="mt-auto flex flex-col gap-4 border-t border-slate-100 pt-6">
                         <AddToCart product={product} />
                         
                         {/* Chat with Seller Button */}
                         {!isOwnProduct && (
                             <button
                                 onClick={() => setIsChatOpen(!isChatOpen)}
-                                className="w-full flex justify-center items-center gap-2 py-3 px-4 border-2 border-green-600 text-green-700 font-bold rounded-xl hover:bg-green-50 transition-colors"
+                                className="w-full flex justify-center items-center gap-2 py-4 px-4 border-2 border-emerald-100 text-emerald-700 font-bold rounded-2xl hover:bg-emerald-50 hover:border-emerald-200 transition-all duration-300"
                             >
                                 💬 {isChatOpen ? 'Close Chat' : 'Chat with Seller'}
                             </button>
@@ -66,22 +66,26 @@ const ProductDetail = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                 {/* Bidding Panel - ONLY VISIBLE IF BIDDING IS ENABLED */}
                 {product.biddingEnabled && (
-                    <BidPanel product={product} />
+                    <div className="animate-fade-in-up">
+                        <BidPanel product={product} />
+                    </div>
                 )}
 
                 {/* ChatBox - Toggled via button */}
                 {isChatOpen && !isOwnProduct && (
-                    <div className="fixed bottom-6 right-6 z-50 w-80 md:w-96 shadow-2xl rounded-2xl animate-fade-in-up">
-                        <div className="flex justify-between items-center bg-green-700 px-4 py-2 rounded-t-2xl relative top-2 z-10">
-                            <span className="text-white font-bold text-sm">💬 Chat</span>
-                            <button onClick={() => setIsChatOpen(false)} className="text-green-200 hover:text-white">
+                    <div className="fixed bottom-6 right-6 z-50 w-80 md:w-96 shadow-2xl rounded-3xl animate-fade-in-up border border-white/20 glass overflow-hidden">
+                        <div className="flex justify-between items-center bg-emerald-600/90 backdrop-blur-md px-6 py-4 relative z-10 border-b border-emerald-500/50">
+                            <span className="text-white font-black tracking-wide text-sm">💬 Chat with {sellerName}</span>
+                            <button onClick={() => setIsChatOpen(false)} className="text-emerald-100 hover:text-white transition-colors">
                                 ✖
                             </button>
                         </div>
-                        <ChatBox
-                            receiverId={sellerId}
-                            receiverName={sellerName}
-                        />
+                        <div className="bg-white/90 backdrop-blur-md">
+                            <ChatBox
+                                receiverId={sellerId}
+                                receiverName={sellerName}
+                            />
+                        </div>
                     </div>
                 )}
             </div>
