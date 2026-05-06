@@ -38,7 +38,7 @@ const ProductDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
 
                 {/* LEFT: Product Images */}
-                <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center">
+                <div>
                     <ProductGallery images={product.images} title={product.title} />
                 </div>
 
