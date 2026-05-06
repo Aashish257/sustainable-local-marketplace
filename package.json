@@ -1,5 +1,16 @@
 {
+  "name": "sustainable-marketplace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm run preview\""
+  },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.2"
+    "@tailwindcss/vite": "^4.2.2",
+    "concurrently": "^8.2.2"
   }
 }
