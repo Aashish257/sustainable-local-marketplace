@@ -10,6 +10,7 @@ import CheckoutPage from "../modules/order/pages/CheckoutPage";
 import PaymentPage from "../modules/payment/pages/PaymentPage";
 import SuccessPage from "../modules/payment/pages/SuccessPage";
 import { SkeletonGrid } from "../shared/components/SkeletonLoader";
+import HomePage from "../modules/home/HomePage";
 
 import GuestRoute from "../shared/layout/GuestRoute";
 
@@ -32,7 +33,6 @@ const Router = () => {
 
                 {/* Protected Routes */}
                 <Route element={<ProtectedRoute />}>
-                    <Route path="/" element={<div className="p-4 text-xl">🏠 Home — Protected ✅</div>} />
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/payment/:orderId" element={<PaymentPage />} />
                     <Route path="/success" element={<SuccessPage />} />
@@ -47,6 +47,7 @@ const Router = () => {
                 </Route>
 
                 {/* Public Routes */}
+                <Route path="/" element={<HomePage />} />
                 <Route path="/products" element={<ProductList />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<CartPage />} />
