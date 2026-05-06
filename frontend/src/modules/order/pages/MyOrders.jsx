@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import apiClient from '../../services/apiClient';
-import { ORDERS } from '../../services/endpoints';
-import { SkeletonGrid } from '../../shared/components/SkeletonLoader';
+import apiClient from '../../../services/apiClient';
+import { ORDERS } from '../../../services/endpoints';
+import { SkeletonGrid } from '../../../shared/components/SkeletonLoader';
 import { Link } from 'react-router-dom';
 
 const statusColors = {

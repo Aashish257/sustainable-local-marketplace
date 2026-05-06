@@ -65,7 +65,7 @@ const PaymentPage = () => {
             <button
                 onClick={handlePayment}
                 disabled={isCreating || isVerifying}
-                className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow-md transition-colors disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-black py-4 px-6 rounded-2xl shadow-lg shadow-emerald-200 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none tracking-wide text-lg"
             >
                 {isCreating || isVerifying ? "Processing..." : "Pay Now"}
             </button>
