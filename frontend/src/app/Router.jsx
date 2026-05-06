@@ -12,6 +12,8 @@ import SuccessPage from "../modules/payment/pages/SuccessPage";
 import { SkeletonGrid } from "../shared/components/SkeletonLoader";
 import HomePage from "../modules/home/HomePage";
 
+const MyOrders = lazy(() => import("../modules/order/pages/MyOrders"));
+
 import GuestRoute from "../shared/layout/GuestRoute";
 
 // Lazy loaded — Dashboard is only downloaded when user visits /dashboard
@@ -45,6 +47,7 @@ const Router = () => {
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/payment/:orderId" element={<PaymentPage />} />
                     <Route path="/success" element={<SuccessPage />} />
+                    <Route path="/my-orders" element={<MyOrders />} />
 
                     {/* Dashboard — lazy loaded, seller only (RBAC inside DashboardLayout) */}
                     <Route path="/dashboard" element={<DashboardLayout />}>

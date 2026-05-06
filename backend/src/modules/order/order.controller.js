@@ -14,7 +14,7 @@ export const createOrder = async (req, res, next) => {
 export const getMyOrders = async (req, res, next) => {
     try {
         const orders = await Order.find({ buyerId: req.user.id })
-            .populate("items.productId", "title price")
+            .populate("items.productId", "title price images")
             .sort({ createdAt: -1 });
         res.json({ success: true, data: orders });
     } catch (err) {
@@ -30,7 +30,7 @@ export const getSellerOrders = async (req, res, next) => {
         const orders = await Order.find({})
             .populate({
                 path: "items.productId",
-                select: "title price sellerId",
+                select: "title price sellerId images",
                 match: { sellerId: req.user.id }
             })
             .sort({ createdAt: -1 });

@@ -58,6 +58,12 @@ const Navbar = () => {
                         🛒 Cart
                     </Link>
 
+                    {token && (
+                        <Link to="/my-orders" className="text-gray-600 hover:text-green-600 text-sm font-medium transition-colors hidden sm:block">
+                            🛍️ My Orders
+                        </Link>
+                    )}
+
                     {token && user?.role === 'seller' && (
                         <Link to="/dashboard" className="text-gray-600 hover:text-green-600 text-sm font-medium transition-colors hidden md:block">
                             Dashboard
