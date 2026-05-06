@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useProduct } from '../services/productQueries';
 import ProductGallery from '../components/ProductGallery';
@@ -22,6 +23,8 @@ const ProductDetail = () => {
 
     const product = data.data;
 
+    const [isChatOpen, setIsChatOpen] = useState(false);
+
     // Seller ID from product — used for the ChatBox
     const sellerId = product.sellerId?._id || product.sellerId;
     const sellerName = product.sellerId?.name || "Seller";
@@ -30,7 +33,7 @@ const ProductDetail = () => {
     const isOwnProduct = user?.id === sellerId?.toString();
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 relative">
             {/* TOP SECTION: Images on Left, Info on Right */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
 
@@ -42,8 +45,18 @@ const ProductDetail = () => {
                 {/* RIGHT: Product Info + Add to Cart */}
                 <div className="flex flex-col gap-4">
                     <ProductInfo product={product} />
-                    <div className="mt-auto">
+                    <div className="mt-auto flex flex-col gap-4">
                         <AddToCart product={product} />
+                        
+                        {/* Chat with Seller Button */}
+                        {!isOwnProduct && (
+                            <button
+                                onClick={() => setIsChatOpen(!isChatOpen)}
+                                className="w-full flex justify-center items-center gap-2 py-3 px-4 border-2 border-green-600 text-green-700 font-bold rounded-xl hover:bg-green-50 transition-colors"
+                            >
+                                💬 {isChatOpen ? 'Close Chat' : 'Chat with Seller'}
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -51,15 +64,25 @@ const ProductDetail = () => {
 
             {/* LIVE AUCTION & CHAT SECTION */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                {/* Bidding Panel */}
-                <BidPanel product={product} />
+                {/* Bidding Panel - ONLY VISIBLE IF BIDDING IS ENABLED */}
+                {product.biddingEnabled && (
+                    <BidPanel product={product} />
+                )}
 
-                {/* Chat with Seller (hidden if viewing your own product) */}
-                {!isOwnProduct && (
-                    <ChatBox
-                        receiverId={sellerId}
-                        receiverName={sellerName}
-                    />
+                {/* ChatBox - Toggled via button */}
+                {isChatOpen && !isOwnProduct && (
+                    <div className="fixed bottom-6 right-6 z-50 w-80 md:w-96 shadow-2xl rounded-2xl animate-fade-in-up">
+                        <div className="flex justify-between items-center bg-green-700 px-4 py-2 rounded-t-2xl relative top-2 z-10">
+                            <span className="text-white font-bold text-sm">💬 Chat</span>
+                            <button onClick={() => setIsChatOpen(false)} className="text-green-200 hover:text-white">
+                                ✖
+                            </button>
+                        </div>
+                        <ChatBox
+                            receiverId={sellerId}
+                            receiverName={sellerName}
+                        />
+                    </div>
                 )}
             </div>
 

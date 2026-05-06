@@ -19,6 +19,7 @@ const DashboardLayout = lazy(() => import("../modules/dashboard/layout/Dashboard
 const DashboardHome = lazy(() => import("../modules/dashboard/pages/DashboardHome"));
 const SellerProducts = lazy(() => import("../modules/dashboard/pages/SellerProducts"));
 const AddProduct = lazy(() => import("../modules/dashboard/pages/AddProduct"));
+const EditProduct = lazy(() => import("../modules/dashboard/pages/EditProduct"));
 const SellerOrders = lazy(() => import("../modules/dashboard/pages/SellerOrders"));
 const Analytics = lazy(() => import("../modules/dashboard/pages/Analytics"));
 
@@ -43,6 +44,7 @@ const Router = () => {
                         <Route index element={<DashboardHome />} />
                         <Route path="products" element={<SellerProducts />} />
                         <Route path="products/add" element={<AddProduct />} />
+                        <Route path="products/edit/:id" element={<EditProduct />} />
                         <Route path="orders" element={<SellerOrders />} />
                         <Route path="analytics" element={<Analytics />} />
                     </Route>

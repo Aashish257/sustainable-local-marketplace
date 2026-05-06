@@ -84,6 +84,12 @@ const SellerProducts = () => {
                                             >
                                                 View
                                             </Link>
+                                            <Link
+                                                to={`/dashboard/products/edit/${p._id}`}
+                                                className="text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
+                                            >
+                                                Edit
+                                            </Link>
                                             <button
                                                 onClick={() => handleDelete(p._id, p.title)}
                                                 disabled={isDeleting}
