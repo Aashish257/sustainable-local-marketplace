@@ -5,9 +5,14 @@ import useNotificationStore from '../../store/notificationStore';
 import useThemeStore from '../../store/themeStore';
 import CartDrawer from '../components/CartDrawer';
 import { useCartStore } from '../../modules/cart/store/cartStore';
+import { homeFor, isShopper, navLinksFor } from '../../app/roles';
 
 const Navbar = () => {
     const { token, user, logout } = useAuthStore();
+    // Role decides the navigation: shoppers see the store, sellers/admins see their work areas
+    const currentUser = token ? user : null;
+    const shopper = isShopper(currentUser);
+    const links = navLinksFor(currentUser);
     const { theme, toggleTheme } = useThemeStore();
     const navigate = useNavigate();
     const location = useLocation();
@@ -81,7 +86,7 @@ const Navbar = () => {
                     <div className="flex items-center justify-between h-16 gap-4">
                         
                         {/* 1. Brand Logo */}
-                        <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+                        <Link to={homeFor(currentUser?.role)} className="flex items-center gap-2.5 flex-shrink-0 group">
                             <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/30 group-hover:scale-105 transition-transform">
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M12 2a9 9 0 0 1 9 9c0 4.97-4.03 9-9 9A9 9 0 0 1 3 11C3 6.03 7.03 2 12 2z" />
@@ -101,41 +106,25 @@ const Navbar = () => {
                         </Link>
 
                         {/* 2. Desktop Navigation Links */}
-                        <nav className="hidden lg:flex items-center gap-6 font-sans text-xs font-semibold">
-                            <NavLink
-                                to="/marketplace"
-                                className={({ isActive }) =>
-                                    `transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${
-                                        isActive ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-[var(--text-muted)]'
-                                    }`
-                                }
-                            >
-                                Marketplace
-                            </NavLink>
-                            <NavLink
-                                to="/how-it-works"
-                                className={({ isActive }) =>
-                                    `transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${
-                                        isActive ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-[var(--text-muted)]'
-                                    }`
-                                }
-                            >
-                                How It Works
-                            </NavLink>
-                            <NavLink
-                                to="/about"
-                                className={({ isActive }) =>
-                                    `transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${
-                                        isActive ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-[var(--text-muted)]'
-                                    }`
-                                }
-                            >
-                                About Mission
-                            </NavLink>
+                        <nav aria-label="Main" className="hidden lg:flex items-center gap-6 font-sans text-xs font-semibold">
+                            {links.map((l) => (
+                                <NavLink
+                                    key={l.to}
+                                    to={l.to}
+                                    end={l.end}
+                                    className={({ isActive }) =>
+                                        `transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 ${
+                                            isActive ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-[var(--text-muted)]'
+                                        }`
+                                    }
+                                >
+                                    {l.label}
+                                </NavLink>
+                            ))}
                         </nav>
 
                         {/* 3. Global Search Input */}
-                        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xs relative">
+                        <form onSubmit={handleSearch} className={`${shopper ? 'hidden md:flex' : 'hidden'} flex-1 max-w-xs relative`}>
                             <input
                                 type="text"
                                 placeholder="Search organic products, artisans..."
@@ -226,8 +215,8 @@ const Navbar = () => {
                                 </Link>
                             )}
 
-                            {/* Shopping Cart Trigger */}
-                            <button
+                            {/* Shopping Cart Trigger (shoppers only) */}
+                            {shopper && (<button
                                 onClick={() => setCartOpen(true)}
                                 className="w-8 h-8 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors relative cursor-pointer"
                                 aria-label={`Open shopping cart with ${cartCount} items`}
@@ -240,7 +229,7 @@ const Navbar = () => {
                                         {cartCount}
                                     </span>
                                 )}
-                            </button>
+                            </button>)}
 
                             {/* Role Navigation Button */}
                             {user?.role === 'seller' && (
@@ -287,13 +276,13 @@ const Navbar = () => {
                                             >
                                                 Account Profile
                                             </Link>
-                                            <Link
+                                            {user?.role === 'buyer' && (<Link
                                                 to="/orders"
                                                 onClick={() => setUserMenuOpen(false)}
                                                 className="block px-3 py-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-main)]"
                                             >
                                                 My Orders
-                                            </Link>
+                                            </Link>)}
 
                                             {user?.role === 'seller' && (
                                                 <Link
@@ -354,7 +343,7 @@ const Navbar = () => {
                 {/* Mobile Drawer Menu */}
                 {mobileOpen && (
                     <div className="lg:hidden border-t border-[var(--border-card)] bg-[var(--bg-surface)] dark:bg-[#041c15] p-4 space-y-3 font-sans text-sm">
-                        <form onSubmit={handleSearch} className="relative mb-3">
+                        <form onSubmit={handleSearch} className={`${shopper ? '' : 'hidden'} relative mb-3`}>
                             <input
                                 type="text"
                                 placeholder="Search catalog..."
@@ -367,15 +356,11 @@ const Navbar = () => {
                             </svg>
                         </form>
 
-                        <Link to="/marketplace" className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
-                            Marketplace Catalog
-                        </Link>
-                        <Link to="/how-it-works" className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
-                            How It Works
-                        </Link>
-                        <Link to="/about" className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
-                            About Mission
-                        </Link>
+                        {links.map((l) => (
+                            <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)} className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
+                                {l.label}
+                            </Link>
+                        ))}
                         {/* On phones the top bar only has room for "Join", so sign-in lives here */}
                         {!token && (
                             <Link to="/login" onClick={() => setMobileOpen(false)} className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
@@ -384,9 +369,6 @@ const Navbar = () => {
                         )}
                         {token && (
                             <>
-                                <Link to="/orders" className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
-                                    My Orders
-                                </Link>
                                 <Link to="/messages" className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
                                     Direct Messages
                                 </Link>
@@ -413,7 +395,7 @@ const Navbar = () => {
             </header>
 
             {/* Slide-over Cart Drawer */}
-            <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+            {shopper && <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />}
         </>
     );
 };

@@ -1,3 +1,4 @@
+import RoleRoute from "../shared/layout/RoleRoute";
 import { Route, Routes } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import LoginPage from "../modules/auth/LoginPage";
@@ -40,6 +41,7 @@ const AdminDashboard = lazy(() => import("../modules/admin/pages/AdminDashboard"
 const AdminUsers = lazy(() => import("../modules/admin/pages/AdminUsers"));
 const AdminProducts = lazy(() => import("../modules/admin/pages/AdminProducts"));
 const AdminOrders = lazy(() => import("../modules/admin/pages/AdminOrders"));
+const AuctionsPage = lazy(() => import("../modules/bid/pages/AuctionsPage"));
 
 const Router = () => {
     return (
@@ -51,27 +53,30 @@ const Router = () => {
                     <Route path="/register" element={<RegisterPage />} />
                 </Route>
 
-                {/* Protected Routes */}
-                <Route element={<ProtectedRoute />}>
-                    {/* Cart & Checkout Flow */}
+                {/* SHOP: guests + buyers. Sellers/admins are sent to their dashboard */}
+                <Route element={<RoleRoute allow={["buyer"]} guests />}>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/products" element={<ProductList />} />
+                    <Route path="/marketplace" element={<ProductList />} />
+                    <Route path="/auctions" element={<AuctionsPage />} />
+                </Route>
+
+                {/* BUYER ONLY: cart, checkout, payment, purchase history */}
+                <Route element={<RoleRoute allow={["buyer"]} />}>
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/payment/:orderId" element={<PaymentPage />} />
                     <Route path="/payment/success" element={<SuccessPage />} />
                     <Route path="/payment/failure" element={<PaymentFailurePage />} />
                     <Route path="/success" element={<SuccessPage />} />
-
-                    {/* Buyer Orders & Details */}
                     <Route path="/my-orders" element={<MyOrders />} />
                     <Route path="/orders" element={<MyOrders />} />
                     <Route path="/orders/:orderId" element={<OrderDetail />} />
+                </Route>
 
-                    {/* Buyer Extras */}
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/notifications" element={<NotificationsPage />} />
-                    <Route path="/messages" element={<ChatPage />} />
-
-                    {/* Dashboard — lazy loaded, seller only (RBAC inside DashboardLayout) */}
+                {/* SELLER ONLY */}
+                <Route element={<RoleRoute allow={["seller"]} />}>
                     <Route path="/dashboard" element={<DashboardLayout />}>
                         <Route index element={<DashboardHome />} />
                         <Route path="products" element={<SellerProducts />} />
@@ -86,8 +91,10 @@ const Router = () => {
                         <Route path="messages" element={<ChatPage />} />
                         <Route path="profile" element={<ProfilePage />} />
                     </Route>
+                </Route>
 
-                    {/* Admin Panel (RBAC inside AdminLayout) */}
+                {/* ADMIN ONLY */}
+                <Route element={<RoleRoute allow={["admin"]} />}>
                     <Route path="/admin" element={<AdminLayout />}>
                         <Route index element={<AdminDashboard />} />
                         <Route path="users" element={<AdminUsers />} />
@@ -98,11 +105,14 @@ const Router = () => {
                     </Route>
                 </Route>
 
-                {/* Public Routes */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/products" element={<ProductList />} />
-                <Route path="/marketplace" element={<ProductList />} />
+                {/* ANY LOGGED-IN USER */}
+                <Route element={<RoleRoute />}>
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/messages" element={<ChatPage />} />
+                </Route>
+
+                {/* EVERYONE: product detail (buy/bid actions only for buyers), info pages */}
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/how-it-works" element={<HowItWorksPage />} />

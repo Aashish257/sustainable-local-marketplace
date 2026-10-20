@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Gavel } from 'lucide-react';
 import { useProducts } from '../services/productQueries';
 import ProductCard from '../components/ProductCard';
 import FilterPanel from '../components/FilterPanel';
@@ -40,6 +41,7 @@ const ProductList = () => {
         maxPrice: '',
         minEcoScore: '',
         sort: '',
+        type: 'fixed', // auction items live on /auctions
     });
 
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -67,6 +69,7 @@ const ProductList = () => {
             maxPrice: '',
             minEcoScore: '',
             sort: '',
+            type: 'fixed',
         });
     };
 
@@ -88,6 +91,11 @@ const ProductList = () => {
                         <p className="text-xs text-[var(--text-muted)] font-sans mt-1 max-w-xl">
                             Direct local goods crafted by organic farmers and zero-waste artisans. Filter by verified sustainability metrics.
                         </p>
+                        {/* Auctions have their own page; point buyers to it from the catalog */}
+                        <Link to="/auctions" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 dark:text-amber-400 hover:underline">
+                            <Gavel className="w-4 h-4" aria-hidden="true" />
+                            Looking for one-of-a-kind pieces? See live auctions →
+                        </Link>
                     </div>
 
                     <div className="flex items-center gap-4 text-xs font-mono">

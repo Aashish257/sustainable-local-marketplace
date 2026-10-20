@@ -35,6 +35,9 @@ const shots = [
     { name: "11-admin-products", path: "/admin/products", as: "admin@sustain.com" },
     { name: "12-catalog-mobile", path: "/products", mobile: true },
     { name: "13-catalog-dark", path: "/products", dark: true },
+    { name: "14-auctions", path: "/auctions" },
+    { name: "15-seller-opens-marketplace", path: "/marketplace", as: "seller@sustain.com" },
+    { name: "16-admin-views-product", path: `/products/${auction?._id}`, as: "admin@sustain.com" },
 ];
 
 // PW_CHROMIUM lets you reuse an already-downloaded Chromium instead of "npx playwright install"

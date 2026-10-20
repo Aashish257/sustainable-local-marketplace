@@ -11,6 +11,7 @@ import ChatBox from '../../chat/components/ChatBox';
 import ScoreGauge from '../../../shared/components/ScoreGauge';
 import ScoreRadar from '../../../shared/components/ScoreRadar';
 import useAuthStore from '../../../store/authStore';
+import { isShopper } from '../../../app/roles';
 import { SkeletonDetail } from '../../../shared/components/SkeletonLoader';
 
 const ProductDetail = () => {
@@ -40,6 +41,7 @@ const ProductDetail = () => {
     const sellerId = product.sellerId?._id || product.sellerId;
     const sellerName = product.sellerId?.name || "Verified Producer";
     const isOwnProduct = user?.id === sellerId?.toString();
+    const canShop = isShopper(user);
 
     return (
         <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-main)] transition-colors duration-300 pb-24">
@@ -135,15 +137,22 @@ const ProductDetail = () => {
                                 {product.description}
                             </p>
 
+                            {/* Sellers/admins view listings; buying and bidding are buyer actions */}
+                            {!canShop && (
+                                <p className="pt-3 text-sm text-[var(--text-muted)]">
+                                    You're viewing this listing as {user?.role === 'admin' ? 'an admin' : 'a seller'}. Buying and bidding are available to buyer accounts.
+                                </p>
+                            )}
+
                             {/* Cart / Buy Action */}
-                            {!product.biddingEnabled && (
+                            {canShop && !product.biddingEnabled && (
                                 <div className="pt-3">
                                     <AddToCart product={product} />
                                 </div>
                             )}
 
                             {/* Auction Live Terminal */}
-                            {product.biddingEnabled && (
+                            {canShop && product.biddingEnabled && (
                                 <div className="pt-2">
                                     <BidPanel product={product} />
                                 </div>

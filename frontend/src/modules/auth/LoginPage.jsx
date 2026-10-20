@@ -1,7 +1,8 @@
+import { homeFor } from '../../app/roles';
 import { Leaf } from 'lucide-react';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { loginUser } from './api';
 import useAuthStore from '../../store/authStore';
 import ThreeAuthBackground from '../../shared/components/ThreeAuthBackground';
@@ -13,11 +14,15 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
+    const location = useLocation();
+
     const mutation = useMutation({
         mutationFn: loginUser,
         onSuccess: (data) => {
             login(data.data.user, data.data.token);
-            navigate('/');
+            // Back to the page that asked for login (buyers), else the role's home
+            const role = data.data.user?.role;
+            navigate(role === 'buyer' && location.state?.from ? location.state.from : homeFor(role), { replace: true });
         }
     });
 

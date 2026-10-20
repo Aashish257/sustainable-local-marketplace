@@ -34,7 +34,9 @@ export const getProductsService = async (query) => {
         maxPrice,
         minEcoScore,
         sort,
-        search
+        search,
+        type,     // "fixed" = buy-now items, "auction" = auction items
+        auction,  // with type=auction: "live" or "ended"
     } = query;
 
     // Public catalog shows only approved, active listings
@@ -64,12 +66,25 @@ export const getProductsService = async (query) => {
         filter.sustainabilityScore = { $gte: Number(minEcoScore) };
     }
 
+    // Marketplace (fixed price) and Auctions are separate sections of the site
+    if (type === "fixed") filter.biddingEnabled = { $ne: true };
+    if (type === "auction") filter.biddingEnabled = true;
+    if (type === "auction" && auction === "live") {
+        filter.auctionClosed = { $ne: true };
+        // $and keeps this separate from the search $or above
+        filter.$and = [{ $or: [{ biddingEndTime: null }, { biddingEndTime: { $gt: new Date() } }] }];
+    }
+    if (type === "auction" && auction === "ended") {
+        filter.$and = [{ $or: [{ auctionClosed: true }, { biddingEndTime: { $lte: new Date() } }] }];
+    }
+
     let sortObj = { createdAt: -1 };
     if (sort === "price_asc") sortObj = { price: 1 };
     else if (sort === "price_desc") sortObj = { price: -1 };
     else if (sort === "rating") sortObj = { averageRating: -1 };
     else if (sort === "eco") sortObj = { sustainabilityScore: -1 };
     else if (sort === "newest") sortObj = { createdAt: -1 };
+    else if (sort === "ending") sortObj = { biddingEndTime: 1, createdAt: -1 }; // soonest first
 
     const pageNum = Math.max(1, parseInt(page) || 1);
     const limitNum = Math.max(1, parseInt(limit) || 12);
@@ -100,6 +115,24 @@ export const updateProductService = async (id, data, user) => {
     if (sellerId !== user.id) {
         throw new AppError("Unauthorized", 403);
     }
+
+    // The edit form re-sends every field, so only count values that actually differ
+    const same = (a, b) =>
+        a instanceof Date || b instanceof Date
+            ? new Date(a).getTime() === new Date(b).getTime()
+            : JSON.stringify(a) === JSON.stringify(b);
+    const changed = (f) => data[f] !== undefined && !same(data[f], product[f]);
+
+    // Auction settings are locked once bidding has started
+    const biddingFields = ["biddingEnabled", "biddingStartingPrice", "biddingEndTime"];
+    if ((product.currentBid != null || product.auctionClosed) && biddingFields.some(changed)) {
+        throw new AppError("Auction settings cannot change after bidding has started", 409);
+    }
+
+    // Changing what buyers see (text, photos, eco score) sends the listing back to moderation.
+    // Price and stock changes don't.
+    const contentFields = ["title", "description", "images", "category", "sustainabilityScore"];
+    if (contentFields.some(changed)) data = { ...data, isApproved: false };
 
     const updated = await updateProduct(id, data);
 

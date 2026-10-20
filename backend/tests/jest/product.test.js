@@ -104,3 +104,32 @@ describe("FR-2.3 Catalog query", () => {
         expect(await Product.countDocuments()).toBe(4);
     });
 });
+
+describe("FR-2.6 Marketplace vs Auctions sections", () => {
+    beforeEach(async () => {
+        const seller = await makeUser("seller");
+        const id = seller.user._id;
+        await makeProduct(id, { title: "Fixed Mug" });
+        await makeProduct(id, { title: "Live Soon", biddingEnabled: true, biddingEndTime: new Date(Date.now() + 3_600_000) });
+        await makeProduct(id, { title: "Live Later", biddingEnabled: true, biddingEndTime: new Date(Date.now() + 86_400_000) });
+        await makeProduct(id, { title: "Ended One", biddingEnabled: true, biddingEndTime: new Date(Date.now() - 1000), auctionClosed: true });
+    });
+    const titles = (res) => res.body.data.map((p) => p.title);
+
+    it("type=fixed returns only buy-now items", async () => {
+        expect(titles(await request(app).get("/api/products?type=fixed"))).toEqual(["Fixed Mug"]);
+    });
+
+    it("live auctions are sorted by soonest ending and exclude ended ones", async () => {
+        const res = await request(app).get("/api/products?type=auction&auction=live&sort=ending");
+        expect(titles(res)).toEqual(["Live Soon", "Live Later"]);
+    });
+
+    it("ended auctions are listed separately", async () => {
+        expect(titles(await request(app).get("/api/products?type=auction&auction=ended"))).toEqual(["Ended One"]);
+    });
+
+    it("search still works together with the auction filter", async () => {
+        expect(titles(await request(app).get("/api/products?type=auction&auction=live&search=later"))).toEqual(["Live Later"]);
+    });
+});
