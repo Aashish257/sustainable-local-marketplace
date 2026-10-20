@@ -21,9 +21,13 @@ export const createProduct = async (req, res, next) => {
 
 export const getProducts = async (req, res, next) => {
     try {
-        const products = await getProductsService(req.query);
+        const result = await getProductsService(req.query);
 
-        res.json({ success: true, data: products });
+        res.json({
+            success: true,
+            data: result.products,
+            pagination: result.pagination
+        });
     } catch (err) {
         next(err);
     }
@@ -31,7 +35,7 @@ export const getProducts = async (req, res, next) => {
 
 export const getProductById = async (req, res, next) => {
     try {
-        const product = await getProductByIdService(req.params.id);
+        const product = await getProductByIdService(req.params.id, req.user);
         res.json({ success: true, data: product });
     } catch (err) {
         next(err);

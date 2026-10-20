@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { AppError } from "../utils/AppError.js";
 
 export const protect = (req, res, next) => {
     try {
@@ -12,8 +13,22 @@ export const protect = (req, res, next) => {
 
         next();
     } catch (err) {
-        next(new Error("Unauthorized"));
+        // 401 so clients can tell "log in again" apart from a server error
+        next(new AppError("Unauthorized", 401));
     }
+};
+
+// Sets req.user when a valid token is sent, but never blocks the request
+export const optionalAuth = (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (token) {
+        try {
+            req.user = jwt.verify(token, process.env.JWT_SECRET);
+        } catch {
+            // invalid token: continue as a guest
+        }
+    }
+    next();
 };
 
 export const authorize = (...roles) => {

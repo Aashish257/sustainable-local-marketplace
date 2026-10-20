@@ -55,10 +55,33 @@ const productSchema = new mongoose.Schema(
             type: Number,
             default: 0
         },
+        biddingEnabled: {
+            type: Boolean,
+            default: false
+        },
+        biddingStartingPrice: {
+            type: Number,
+            min: [0, "Starting price cannot be negative"],
+            default: 0
+        },
+        biddingEndTime: {
+            type: Date
+        },
+        // Live auction state, updated atomically by bid.service.js
+        currentBid: { type: Number, default: null },
+        currentBidder: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+        // Moderation: new listings stay hidden until an admin approves them
+        isApproved: { type: Boolean, default: false, index: true },
+        isActive: { type: Boolean, default: true }
     },
     {
         timestamps: true
     }
 );
+
+productSchema.index({ category: 1 });
+productSchema.index({ price: 1 });
+productSchema.index({ sustainabilityScore: 1 });
+productSchema.index({ createdAt: -1 });
 
 export const Product = mongoose.model("Product", productSchema);

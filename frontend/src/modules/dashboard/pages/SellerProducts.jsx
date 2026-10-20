@@ -5,6 +5,7 @@ import { PRODUCTS_MINE } from '../../../services/endpoints';
 import { useDeleteProduct } from '../../product/services/productQueries';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import EmptyState from '../../../shared/components/EmptyState';
 
 const SellerProducts = () => {
     const queryClient = useQueryClient();
@@ -17,92 +18,130 @@ const SellerProducts = () => {
     const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
     const handleDelete = (id, title) => {
-        if (!window.confirm(`Delete "${title}"?`)) return;
+        if (!window.confirm(`Are you sure you want to delete "${title}"?`)) return;
         deleteProduct(id, {
             onSuccess: () => {
-                toast.success('Product deleted!');
+                toast.success('Product deleted successfully');
                 queryClient.invalidateQueries({ queryKey: ['my-products'] });
             },
-            onError: () => toast.error('Failed to delete product.')
+            onError: () => toast.error('Failed to delete product')
         });
     };
 
     const products = data?.data || [];
 
     return (
-        <div>
-            <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">My Products</h1>
+        <div className="space-y-6 animate-fade-in-up">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <div className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-mono text-xs uppercase tracking-wider mb-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        CATALOG MANAGEMENT
+                    </div>
+                    <h1 className="text-2xl sm:text-3xl font-black font-display text-[var(--text-main)]">Active Products</h1>
+                </div>
                 <Link 
                     to="/dashboard/products/add" 
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-2 shadow-sm"
+                    className="btn-primary px-4 py-2 text-xs font-semibold flex items-center gap-2"
                 >
-                    <span className="text-xl leading-none">+</span> Add Product
+                    <span>+</span> Add New Product
                 </Link>
             </div>
 
             {isLoading ? (
                 <div className="space-y-3">
-                    {[1, 2, 3].map(i => <div key={i} className="h-20 bg-gray-100 rounded-xl animate-pulse" />)}
+                    {[1, 2, 3].map(i => <div key={i} className="h-16 glass-card animate-pulse" />)}
                 </div>
             ) : products.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                    <span className="text-4xl mb-4 block">📦</span>
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">No products yet</h3>
-                    <p className="text-gray-500 mb-6">List your first sustainable product to start selling!</p>
-                    <Link 
-                        to="/dashboard/products/add"
-                        className="inline-block bg-green-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                        Add Your First Product
-                    </Link>
-                </div>
+                <EmptyState
+                    title="No products listed yet"
+                    description="Publish your first verified artisan item to make it discoverable to conscious local buyers."
+                    actionLabel="Add Your First Product"
+                    actionLink="/dashboard/products/add"
+                />
             ) : (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <table className="w-full text-sm">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="text-left px-6 py-4 text-gray-500 font-medium">Product</th>
-                                <th className="text-left px-6 py-4 text-gray-500 font-medium hidden md:table-cell">Category</th>
-                                <th className="text-left px-6 py-4 text-gray-500 font-medium">Price</th>
-                                <th className="text-left px-6 py-4 text-gray-500 font-medium hidden md:table-cell">Stock</th>
-                                <th className="text-right px-6 py-4 text-gray-500 font-medium">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                            {products.map(p => (
-                                <tr key={p._id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 font-medium text-gray-800">{p.title}</td>
-                                    <td className="px-6 py-4 text-gray-500 hidden md:table-cell">{p.category}</td>
-                                    <td className="px-6 py-4 font-bold text-green-600">₹{p.price}</td>
-                                    <td className="px-6 py-4 text-gray-500 hidden md:table-cell">{p.stock}</td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Link
-                                                to={`/products/${p._id}`}
-                                                className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg transition-colors"
-                                            >
-                                                View
-                                            </Link>
-                                            <Link
-                                                to={`/dashboard/products/edit/${p._id}`}
-                                                className="text-xs px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors"
-                                            >
-                                                Edit
-                                            </Link>
-                                            <button
-                                                onClick={() => handleDelete(p._id, p.title)}
-                                                disabled={isDeleting}
-                                                className="text-xs px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors disabled:opacity-40"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
+                <div className="glass-card overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-xs text-left">
+                            <thead className="bg-black/[0.02] dark:bg-white/[0.02] text-[var(--text-muted)] border-b border-[var(--border-card)] uppercase tracking-wider text-[10px] font-mono font-bold">
+                                <tr>
+                                    <th className="px-6 py-3.5">Product</th>
+                                    <th className="px-6 py-3.5 hidden md:table-cell">Category</th>
+                                    <th className="px-6 py-3.5">Price</th>
+                                    <th className="px-6 py-3.5 hidden md:table-cell">Stock Status</th>
+                                    <th className="px-6 py-3.5 text-right">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-[var(--border-card)] font-medium">
+                                {products.map(p => (
+                                    <tr key={p._id} className="hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-xl overflow-hidden bg-[var(--border-card)] flex-shrink-0">
+                                                    {p.images?.[0] ? (
+                                                        <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-xs">🌿</div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-[var(--text-main)] text-xs">{p.title}</p>
+                                                    {!p.isApproved && (
+                                                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-mono font-semibold">Pending approval</span>
+                                                    )}
+                                                    {p.biddingEnabled && (
+                                                        <span className="inline-block mt-0.5 text-[9px] font-mono font-bold uppercase text-amber-600 dark:text-amber-400">
+                                                            ⚡ Live Auction
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-[var(--text-muted)] hidden md:table-cell">
+                                            <span className="glass px-2.5 py-1 rounded-full text-[10px]">
+                                                {p.category}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                                            ₹{p.price?.toLocaleString()}
+                                        </td>
+                                        <td className="px-6 py-4 hidden md:table-cell">
+                                            {p.stock <= 0 ? (
+                                                <span className="text-rose-500 font-bold text-[10px] font-mono uppercase">Out of Stock</span>
+                                            ) : (
+                                                <span className="text-emerald-600 dark:text-emerald-400 font-mono text-[10px]">
+                                                    {p.stock} units
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-2 text-[10px]">
+                                                <Link
+                                                    to={`/products/${p._id}`}
+                                                    className="btn-secondary px-2.5 py-1 text-[10px] font-semibold"
+                                                >
+                                                    View
+                                                </Link>
+                                                <Link
+                                                    to={`/dashboard/products/edit/${p._id}`}
+                                                    className="btn-secondary px-2.5 py-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleDelete(p._id, p.title)}
+                                                    disabled={isDeleting}
+                                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 hover:bg-rose-500/20 transition-all font-semibold cursor-pointer disabled:opacity-40"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
         </div>
@@ -110,3 +149,4 @@ const SellerProducts = () => {
 };
 
 export default SellerProducts;
+

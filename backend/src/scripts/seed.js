@@ -122,10 +122,18 @@ const seedDatabase = async () => {
             role: "seller"
         });
 
+        const buyerUser = await User.create({
+            name: "Aria Green",
+            email: "buyer@sustain.com",
+            password: hashedPassword,
+            role: "buyer"
+        });
+
         console.log("📦 Inserting new products...");
         const productsWithSeller = seedProducts.map(p => ({
             ...p,
-            sellerId: sellerUser._id
+            sellerId: sellerUser._id,
+            isApproved: true // seed data is pre-moderated
         }));
 
         await Product.insertMany(productsWithSeller);

@@ -4,7 +4,12 @@ import {
     getSystemStats, 
     getAllUsers, 
     getAllProducts, 
-    getAllOrders 
+    getAllOrders,
+    updateUserRole,
+    deleteUser,
+    deleteProductAdmin,
+    setProductApproval,
+    updateOrderStatusAdmin
 } from "./admin.controller.js";
 
 const router = express.Router();
@@ -17,5 +22,11 @@ router.get("/stats", getSystemStats);
 router.get("/users", getAllUsers);
 router.get("/products", getAllProducts);
 router.get("/orders", getAllOrders);
+
+router.patch("/users/:id/role", updateUserRole);
+router.delete("/users/:id", deleteUser);
+router.delete("/products/:id", deleteProductAdmin);
+router.patch("/products/:id/approval", setProductApproval);
+router.patch("/orders/:id/status", updateOrderStatusAdmin);
 
 export default router;

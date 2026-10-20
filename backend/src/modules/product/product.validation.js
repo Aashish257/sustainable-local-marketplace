@@ -7,7 +7,10 @@ export const createProductSchema = z.object({
     category: z.string().optional(),
     stock: z.number().int().nonnegative("Stock cannot be negative").optional(),
     images: z.array(z.string()).optional(),
-    sustainabilityScore: z.number().min(0).max(10).optional()
+    sustainabilityScore: z.number().min(0).max(10).optional(),
+    biddingEnabled: z.boolean().optional(),
+    biddingStartingPrice: z.number().nonnegative().optional(),
+    biddingEndTime: z.string().or(z.date()).optional()
 });
 
 export const updateProductSchema = z.object({
@@ -17,5 +20,8 @@ export const updateProductSchema = z.object({
     category: z.string().optional(),
     stock: z.number().int().nonnegative().optional(),
     images: z.array(z.string()).optional(),
-    sustainabilityScore: z.number().min(0).max(10).optional()
+    sustainabilityScore: z.number().min(0).max(10).optional(),
+    biddingEnabled: z.boolean().optional(),
+    biddingStartingPrice: z.number().nonnegative().optional(),
+    biddingEndTime: z.string().or(z.date()).optional()
 });
