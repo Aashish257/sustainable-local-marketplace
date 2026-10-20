@@ -70,11 +70,15 @@ export const verifyPaymentService = async ({
     orderId,
 }) => {
     const keySecret = process.env.RAZORPAY_KEY_SECRET || "dummy_secret";
-    const isMock = razorpay_order_id?.startsWith("order_test_") ||
+    // Mock payments are only allowed outside production
+    const allowMock = process.env.NODE_ENV !== "production";
+    const isMock = allowMock && (
+        razorpay_order_id?.startsWith("order_test_") ||
         razorpay_signature === "test_mode_signature" ||
         razorpay_signature?.startsWith("sig_mock_") ||
         razorpay_signature?.startsWith("mock_") ||
-        isTestKey(process.env.RAZORPAY_KEY_ID);
+        isTestKey(process.env.RAZORPAY_KEY_ID)
+    );
 
     if (!isMock) {
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
@@ -83,8 +87,11 @@ export const verifyPaymentService = async ({
             .update(sign.toString())
             .digest("hex");
 
-        if (razorpay_signature !== expectedSign) {
-            throw new Error("Invalid payment signature");
+        // Constant-time compare; lengths must match or timingSafeEqual throws
+        const expected = Buffer.from(expectedSign, "hex");
+        const received = Buffer.from(String(razorpay_signature || ""), "hex");
+        if (received.length !== expected.length || !crypto.timingSafeEqual(received, expected)) {
+            throw new AppError("Invalid payment signature", 400);
         }
     }
 
