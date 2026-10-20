@@ -19,6 +19,9 @@ import bidRoutes from "./modules/bid/bid.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
 
 const app = express();
+// Behind Render/Cloudflare: read the real client IP from X-Forwarded-For (1 proxy hop)
+app.set("trust proxy", 1);
+
 
 // 1. SECURITY HARDENING (Requirement 4)
 app.use(helmet()); // Secure HTTP headers
@@ -37,13 +40,14 @@ const globalLimiter = rateLimit({
 });
 app.use("/api", globalLimiter);
 
-// Specific stricter limit for login (Requirement 4)
+// Auth rate limit: strict in production, lenient in development
 const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 5, // Limit login to 5 attempts per window
-    message: { success: false, error: "Too many login attempts. Try again in an hour." }
+    windowMs: process.env.NODE_ENV === "production" ? 60 * 60 * 1000 : 15 * 60 * 1000,
+    max: process.env.NODE_ENV === "production" ? 5 : 50,
+    message: { success: false, error: "Too many login attempts. Please try again later." }
 });
 app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 
 // 4. API ROUTES
 app.get("/", (req, res) => {
