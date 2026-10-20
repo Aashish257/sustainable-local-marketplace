@@ -4,6 +4,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import { Product } from "../src/models/product.model.js";
 import { Order } from "../src/models/order.model.js";
+import { Notification } from "../src/models/notification.model.js";
 import { verifyPaymentService } from "../src/modules/payment/payment.service.js";
 
 const pay = (orderId) =>
@@ -24,6 +25,7 @@ try {
   const bb = await Order.findById(b._id);
   console.log("   order B:", bb.status, "refundStatus:", bb.refundStatus, "| stock:", (await Product.findById(p._id)).stock);
 } finally {
+  await Notification.deleteMany({ userId: { $in: [a.buyerId, b.buyerId, sellerId] } });
   await Order.deleteMany({ _id: { $in: [a._id, b._id] } });
   await Product.deleteOne({ _id: p._id });
   await mongoose.disconnect();

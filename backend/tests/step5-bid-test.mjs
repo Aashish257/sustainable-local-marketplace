@@ -4,6 +4,7 @@ import "dotenv/config";
 import mongoose from "mongoose";
 import { Product } from "../src/models/product.model.js";
 import { Bid } from "../src/models/bid.model.js";
+import { Notification } from "../src/models/notification.model.js";
 import { placeBid } from "../src/modules/bid/bid.service.js";
 
 const id = () => new mongoose.Types.ObjectId();
@@ -30,6 +31,8 @@ try {
   const top = await Bid.findOne({ productId: p._id }).sort({ amount: -1 });
   console.log("7. top Bid doc matches product ->", top.amount === prod.currentBid, `(bids saved: ${await Bid.countDocuments({ productId: p._id })})`);
 } finally {
+  await new Promise((r) => setTimeout(r, 500)); // let fire-and-forget outbid notifications finish
+  await Notification.deleteMany({ link: { $in: [p, off, ended].map((x) => `/products/${x._id}`) } });
   await Bid.deleteMany({ productId: { $in: [p._id, off._id, ended._id] } });
   await Product.deleteMany({ _id: { $in: [p._id, off._id, ended._id] } });
   await mongoose.disconnect();

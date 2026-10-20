@@ -2,6 +2,7 @@ import User from "../../models/user.model.js";
 import { Product } from "../../models/product.model.js";
 import { Order } from "../../models/order.model.js";
 import { invalidateCache } from "../../middleware/cache.middleware.js";
+import { notifyUser } from "../notification/notification.service.js";
 
 export const getSystemStats = async (req, res, next) => {
     try {
@@ -154,6 +155,7 @@ export const updateOrderStatusAdmin = async (req, res, next) => {
 
         order.status = status;
         await order.save();
+        await notifyUser(order.buyerId, { type: "order", message: `Your order #${order._id.toString().slice(-6)} is now ${status}.`, link: `/orders/${order._id}` });
 
         res.json({ success: true, data: order });
     } catch (err) {

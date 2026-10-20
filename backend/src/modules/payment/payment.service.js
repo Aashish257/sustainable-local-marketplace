@@ -3,6 +3,7 @@ import razorpay from "../../config/razorpay.js";
 import { findOrderById, findOrderByRazorpayId, updateOrder as updateOrderRepo } from "../order/order.repository.js";
 import { updateProduct as updateProductRepo, decrementStockIfAvailable } from "../product/product.repository.js";
 import { AppError } from "../../utils/AppError.js";
+import { notifyUser } from "../notification/notification.service.js";
 
 const isTestKey = (key) => !key || key === "rzp_test_dummy" || key.includes("dummy");
 
@@ -129,11 +130,18 @@ export const verifyPaymentService = async ({
                 }
             }
             await updateOrderRepo(order._id, { status: "cancelled", paymentId, refundStatus });
+            await notifyUser(order.buyerId, { type: "order", message: "An item sold out before payment completed. Your order was cancelled and will be refunded.", link: `/orders/${order._id}` });
             throw new AppError("Item sold out. Your payment will be refunded.", 409);
         }
-        reserved.push({ pId, qty: item.quantity });
+        reserved.push({ pId, qty: item.quantity, sellerId: ok.sellerId, title: ok.title });
     }
 
-    return await updateOrderRepo(order._id, { status: "paid", paymentId });
+    const paidOrder = await updateOrderRepo(order._id, { status: "paid", paymentId });
+
+    await notifyUser(order.buyerId, { type: "order", message: `Payment received. Order #${order._id.toString().slice(-6)} is confirmed.`, link: `/orders/${order._id}` });
+    for (const r of reserved) {
+        await notifyUser(r.sellerId, { type: "order", message: `New paid order: ${r.qty} × ${r.title}`, link: "/dashboard/orders" });
+    }
+    return paidOrder;
 
 };

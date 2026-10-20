@@ -1,6 +1,7 @@
 import { Bid } from "../../models/bid.model.js";
 import { Product } from "../../models/product.model.js";
 import { AppError } from "../../utils/AppError.js";
+import { notifyUser } from "../notification/notification.service.js";
 
 // Single source of truth for bidding (used by REST and socket)
 export const placeBid = async ({ productId, userId, amount }) => {
@@ -8,7 +9,7 @@ export const placeBid = async ({ productId, userId, amount }) => {
     if (!Number.isFinite(amount) || amount <= 0) throw new AppError("Invalid bid amount", 400);
 
     const product = await Product.findById(productId)
-        .select("biddingEnabled biddingEndTime biddingStartingPrice price auctionClosed isApproved isActive");
+        .select("title biddingEnabled biddingEndTime biddingStartingPrice price auctionClosed isApproved isActive");
     if (!product || !product.isApproved || !product.isActive) throw new AppError("Product not found", 404);
     if (!product.biddingEnabled) throw new AppError("Bidding is not enabled for this product", 400);
     if (product.auctionClosed || (product.biddingEndTime && product.biddingEndTime < new Date())) {
@@ -20,7 +21,7 @@ export const placeBid = async ({ productId, userId, amount }) => {
 
     // Atomic: wins only if the amount beats the current bid AND the auction is still open
     // (re-checked here so a bid can't slip in after the scheduler closes the auction)
-    const updated = await Product.findOneAndUpdate(
+    const previous = await Product.findOneAndUpdate(
         {
             _id: productId,
             auctionClosed: { $ne: true },
@@ -30,11 +31,21 @@ export const placeBid = async ({ productId, userId, amount }) => {
             ],
         },
         { $set: { currentBid: amount, currentBidder: userId } },
-        { new: true }
+        { new: false } // return the doc BEFORE the update so we know who was outbid
     );
-    if (!updated) throw new AppError("A higher or equal bid already exists, or the auction just ended", 409);
+    if (!previous) throw new AppError("A higher or equal bid already exists, or the auction just ended", 409);
 
-    return await Bid.create({ productId, userId, amount });
+    const bid = await Bid.create({ productId, userId, amount });
+
+    // Tell the previous leader they were outbid (fire-and-forget: never slows the bid)
+    if (previous.currentBidder && previous.currentBidder.toString() !== userId.toString()) {
+        notifyUser(previous.currentBidder, {
+            type: "bid",
+            message: `You've been outbid on "${product.title}": new top bid ₹${amount}`,
+            link: `/products/${productId}`,
+        });
+    }
+    return bid;
 };
 
 // Close every auction whose end time has passed. Safe to run on many servers at once:

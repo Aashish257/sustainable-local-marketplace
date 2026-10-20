@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import { io as connect } from "socket.io-client";
 import { Product } from "../src/models/product.model.js";
 import { Bid } from "../src/models/bid.model.js";
+import { Notification } from "../src/models/notification.model.js";
 import { placeBid, closeExpiredAuctions } from "../src/modules/bid/bid.service.js";
 
 const id = () => new mongoose.Types.ObjectId();
@@ -62,6 +63,8 @@ try {
     console.log("SKIP  Part B (set API=http://localhost:5055 with the server running)");
   }
 } finally {
+  await sleep(500); // let scheduler notifications finish
+  await Notification.deleteMany({ link: { $in: created.map((c) => `/products/${c}`) } });
   await Bid.deleteMany({ productId: { $in: created } });
   await Product.deleteMany({ _id: { $in: created } });
   await mongoose.disconnect();

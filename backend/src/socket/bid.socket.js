@@ -1,5 +1,4 @@
-import { Bid } from "../models/bid.model.js";
-import { Product } from "../models/product.model.js";
+import { placeBid } from "../modules/bid/bid.service.js";
 import { addNotification } from "../config/queue.js";
 
 export default (io, socket) => {
@@ -17,32 +16,7 @@ export default (io, socket) => {
         const userId = socket.user.id;
 
         try {
-            // A. Validate Product Existence
-            const product = await Product.findById(productId);
-            if (!product) {
-                return socket.emit("bid_error", { message: "Product not found" });
-            }
-
-            // B. Fetch Highest Bid from DB (Requirement 5 & 10)
-            const highestBid = await Bid.findOne({ productId })
-                .sort({ amount: -1 })
-                .limit(1);
-
-            const currentHigh = highestBid ? highestBid.amount : product.price;
-
-            // C. Business Logic (Requirement 5) - Reject lower or equal bids
-            if (amount <= currentHigh) {
-                return socket.emit("bid_error", { 
-                    message: `Bid must be higher than current price of ₹${currentHigh}` 
-                });
-            }
-
-            // D. Persistence: Save valid bid (Requirement 6)
-            const newBid = await Bid.create({
-                productId,
-                userId,
-                amount
-            });
+            const newBid = await placeBid({ productId, userId, amount });
 
             // E. Broadcast: Notify everyone in the product room (Requirement 5)
             io.to(`product:${productId}`).emit("new_bid", {
@@ -52,12 +26,6 @@ export default (io, socket) => {
                 timestamp: newBid.createdAt
             });
 
-            // Real-time notification to all watchers
-            io.to(`product:${productId}`).emit("notification", {
-                type: "bid",
-                message: `🔨 New bid of ₹${newBid.amount} placed!`,
-                link: `/products/${productId}`
-            });
 
             // 1. Queue Background Job for Notification (Requirement 3)
             await addNotification("bid_update", {
@@ -69,7 +37,7 @@ export default (io, socket) => {
         } catch (err) {
 
             console.error("Bidding Error:", err);
-            socket.emit("bid_error", { message: "Failed to place bid" });
+            socket.emit("bid_error", { message: err.status ? err.message : "Failed to place bid" });
         }
     });
 
