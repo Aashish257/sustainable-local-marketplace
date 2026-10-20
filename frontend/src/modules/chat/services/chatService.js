@@ -6,3 +6,8 @@ export const getChatHistory = async (receiverId) => {
     const response = await apiClient.get(url);
     return response.data;
 };
+
+export const getConversations = async () => {
+    const response = await apiClient.get(MESSAGES.CONVERSATIONS);
+    return response.data;
+};

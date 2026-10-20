@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import apiClient from '../../../services/apiClient';
+import ImageUploader from '../../../shared/components/ImageUploader';
 
 const CATEGORIES = [
     'Zero Waste',
@@ -173,10 +174,10 @@ const AddProduct = () => {
                                 onChange={handleChange}
                                 className="w-full h-2 bg-[var(--border-card)] rounded-lg appearance-none cursor-pointer accent-emerald-500 mt-2"
                             />
-                            <div className="flex justify-between text-[10px] font-mono text-[var(--text-muted)] mt-1">
+                            <div className="flex justify-between text-xs font-mono text-[var(--text-muted)] mt-1">
                                 <span>1 (Basic)</span>
                                 <span className="text-emerald-600 dark:text-emerald-400 font-bold">{formData.sustainabilityScore >= 8 ? 'Exemplary' : 'Moderate'}</span>
-                                <span>10 (Pure Circular)</span>
+                                <span>10 (Fully circular)</span>
                             </div>
                         </div>
 
@@ -190,6 +191,7 @@ const AddProduct = () => {
                                 placeholder="https://images.unsplash.com/photo-..."
                                 className="w-full px-4 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-[var(--text-main)] text-xs focus:outline-none focus:border-emerald-500 transition-colors"
                             />
+                            <ImageUploader onUploaded={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))} />
                             {formData.imageUrl && (
                                 <div className="mt-3 flex items-center gap-3">
                                     <div className="w-14 h-14 rounded-xl overflow-hidden border border-[var(--border-card)] bg-[var(--bg-page)] flex-shrink-0">
@@ -208,7 +210,7 @@ const AddProduct = () => {
                                         <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                                         Enable Real-Time Bidding Auction
                                     </h4>
-                                    <p className="text-[11px] text-[var(--text-muted)] font-sans mt-0.5">Allows conscious buyers to place live bids with countdown clock</p>
+                                    <p className="text-xs text-[var(--text-muted)] font-sans mt-0.5">Allows conscious buyers to place live bids with countdown clock</p>
                                 </div>
                                 <input
                                     type="checkbox"
@@ -221,7 +223,7 @@ const AddProduct = () => {
 
                             {formData.biddingEnabled && (
                                 <div className="mt-3 pt-3 border-t border-[var(--border-card)]">
-                                    <label className="block text-[11px] font-mono font-bold text-[var(--text-main)] uppercase mb-1">Starting Floor Bid (₹)</label>
+                                    <label className="block text-xs font-mono font-bold text-[var(--text-main)] uppercase mb-1">Starting Floor Bid (₹)</label>
                                     <input
                                         type="number"
                                         name="biddingStartingPrice"

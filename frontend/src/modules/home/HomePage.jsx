@@ -1,158 +1,129 @@
-import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import apiClient from '../../services/apiClient';
 import { PRODUCTS } from '../../services/endpoints';
 import { SkeletonGrid } from '../../shared/components/SkeletonLoader';
+import ProductCard from '../product/components/ProductCard';
+
+const CATEGORIES = [
+    { name: 'Zero Waste', code: '01' },
+    { name: 'Organic Food', code: '02' },
+    { name: 'Eco Apparel', code: '03' },
+    { name: 'Renewable Energy', code: '04' },
+    { name: 'Handmade Goods', code: '05' },
+    { name: 'Upcycled Goods', code: '06' },
+    { name: 'Home & Garden', code: '07' },
+    { name: 'Refurbished Tech', code: '08' },
+];
 
 const HomePage = () => {
     const navigate = useNavigate();
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ['featured-products'],
-        // Fetch 6-8 products for the homepage
-        queryFn: () => apiClient.get(PRODUCTS, { params: { limit: 8 } }).then(r => r.data),
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        queryFn: () => apiClient.get(PRODUCTS.GET_ALL, { params: { limit: 8 } }).then(r => r.data),
+        staleTime: 5 * 60 * 1000,
     });
 
     const products = data?.data || [];
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            {/* 🌟 HERO SECTION */}
-            <section className="relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-sage-900 text-white py-24 px-4">
-                {/* Abstract background shapes */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-                    <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-                    <div className="absolute top-32 right-12 w-80 h-80 bg-sage-200 rounded-full mix-blend-multiply filter blur-3xl opacity-10"></div>
-                </div>
+        <div className="min-h-screen flex flex-col bg-[#020206] text-white font-mono relative overflow-hidden">
+            {/* Ambient Background Lights */}
+            <div className="absolute top-[20dvh] left-[-10vw] w-[45vw] h-[45vw] rounded-full bg-[#F59E0B]/5 blur-3xl pointer-events-none z-0" />
+            <div className="absolute top-[70dvh] right-[-10vw] w-[35vw] h-[35vw] rounded-full bg-[#FBBF24]/5 blur-3xl pointer-events-none z-0" />
 
-                <div className="container mx-auto max-w-5xl text-center relative z-10 animate-fade-in-up">
-                    <span className="inline-block py-1 px-3 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-100 text-sm font-bold tracking-wider mb-6 backdrop-blur-sm">
-                        ✨ THE NEW STANDARD FOR E-COMMERCE
-                    </span>
-                    <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
-                        Shop Sustainably, <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-sage-100">Shop Local.</span>
-                    </h1>
-                    <p className="text-xl md:text-2xl text-emerald-50 mb-10 max-w-3xl mx-auto font-light leading-relaxed opacity-90">
-                        Discover eco-friendly products crafted by local artisans. Reduce your carbon footprint, one purchase at a time.
-                    </p>
-                    <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button 
-                            onClick={() => navigate('/products')}
-                            className="bg-white text-emerald-900 font-bold text-lg px-8 py-4 rounded-xl hover:bg-emerald-50 transition-all duration-300 hover:-translate-y-1 shadow-xl shadow-emerald-900/50"
-                        >
-                            Browse Products
-                        </button>
-                        <button 
-                            onClick={() => navigate('/register')}
-                            className="glass text-white font-bold text-lg px-8 py-4 rounded-xl hover:bg-white/10 transition-all duration-300 hover:-translate-y-1"
-                        >
-                            Start Selling
-                        </button>
-                    </div>
-                </div>
-            </section>
+            {/* ===== HERO SECTION ===== */}
+            <section className="relative overflow-hidden text-white bg-[#020206] py-16 border-b border-[#27272A] z-10">
+                <div className="container mx-auto max-w-7xl px-4">
+                    <div className="bg-[#0d0d16] border border-[#27272A] p-8 md:p-12 rounded-2xl shadow-2xl relative overflow-hidden">
+                        <div className="inline-flex items-center gap-2 bg-[#020206] border border-[#27272A] text-[#F59E0B] text-xs px-3 py-1.5 rounded-full mb-6 uppercase tracking-wider">
+                            <span className="w-1.5 h-1.5 bg-[#F59E0B] rounded-full animate-pulse" />
+                            INFRASTRUCTURE OVERVIEW // VERIFIED LOCAL COMMERCE
+                        </div>
 
-            {/* 🛍️ FEATURED PRODUCTS SECTION */}
-            <section className="py-20 px-4 container mx-auto max-w-7xl relative z-20 -mt-10">
-                <div className="flex justify-between items-end mb-10 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-                    <div>
-                        <h2 className="text-3xl font-black text-slate-800 tracking-tight">Featured sustainable goods</h2>
-                        <p className="text-slate-500 mt-2 font-medium">Handpicked for minimal environmental impact.</p>
-                    </div>
-                    <Link to="/products" className="hidden md:block text-emerald-600 font-bold hover:text-emerald-700 transition-colors">
-                        View all products &rarr;
-                    </Link>
-                </div>
+                        <h1 className="text-3xl md:text-5xl font-black mb-4 font-sans tracking-tight text-white leading-tight">
+                            Autonomous Sustainable Commerce Mesh
+                        </h1>
 
-                {isLoading ? (
-                    <SkeletonGrid count={8} />
-                ) : isError ? (
-                    <div className="bg-red-50 text-red-500 p-6 rounded-xl text-center font-medium">
-                        Failed to load featured products.
-                    </div>
-                ) : products.length === 0 ? (
-                    <div className="glass soft-shadow border-gray-200 text-gray-500 p-16 rounded-3xl text-center flex flex-col items-center">
-                        <span className="text-5xl mb-4">🍃</span>
-                        <h3 className="text-2xl font-black text-slate-700 mb-2">No products available yet</h3>
-                        <p className="mb-8 font-medium">Be the first to list a sustainable product!</p>
-                        <button 
-                            onClick={() => navigate('/register')}
-                            className="bg-emerald-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
-                        >
-                            Start Selling Now
-                        </button>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                        {products.map((product, idx) => (
-                            <Link 
-                                to={`/products/${product._id}`} 
-                                key={product._id} 
-                                className="group bg-white rounded-3xl overflow-hidden soft-shadow hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-100/50 flex flex-col h-full animate-fade-in-up"
-                                style={{ animationDelay: `${0.1 * idx}s` }}
+                        <p className="text-sm md:text-base text-zinc-400 mb-8 font-sans leading-relaxed max-w-2xl">
+                            Discover verified local producers, compare real-time carbon indices, participate in live auction order books, and make audited purchases that measurably lower carbon footprints.
+                        </p>
+
+                        <div className="flex flex-wrap gap-4 font-mono text-xs">
+                            <button
+                                onClick={() => navigate('/products')}
+                                className="btn-primary px-6 py-3 uppercase font-bold cursor-pointer"
                             >
-                                <div className="h-56 bg-slate-100 relative overflow-hidden">
-                                    <img 
-                                        src={product.images?.[0] || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.title)}&background=e2e8f0&color=64748b&size=400`} 
-                                        alt={product.title}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                                    />
-                                    {/* Glass Overlay on Hover */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    
-                                    {product.sustainabilityScore >= 80 && (
-                                        <div className="absolute top-4 left-4 glass text-emerald-900 text-xs font-black px-3 py-1.5 rounded-lg shadow-sm tracking-wide">
-                                            TOP RATED 🌱
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="p-6 flex flex-col flex-grow bg-white relative z-10">
-                                    <h3 className="text-xl font-black text-slate-800 line-clamp-1 mb-2 group-hover:text-emerald-600 transition-colors">{product.title}</h3>
-                                    <p className="text-sm text-slate-500 line-clamp-2 mb-6 flex-grow font-medium leading-relaxed">{product.description}</p>
-                                    
-                                    <div className="flex justify-between items-end mt-auto pt-4 border-t border-slate-100">
-                                        <div>
-                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Price</p>
-                                            <span className="text-2xl font-black text-slate-900">₹{product.price}</span>
-                                        </div>
-                                        <span className="text-xs bg-slate-50 text-slate-600 px-3 py-1.5 rounded-lg font-bold border border-slate-100">
-                                            {product.category || 'Goods'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+                                EXPLORE CATALOG →
+                            </button>
+                            <button
+                                onClick={() => navigate('/register')}
+                                className="btn-secondary px-6 py-3 uppercase font-bold cursor-pointer"
+                            >
+                                START SELLING
+                            </button>
+                        </div>
                     </div>
-                )}
-                
-                {/* Mobile View All Link */}
-                <div className="mt-12 text-center md:hidden">
-                    <Link to="/products" className="inline-block bg-white border border-slate-200 text-slate-700 font-bold px-8 py-4 rounded-xl hover:bg-slate-50 transition-colors soft-shadow">
-                        View all products
-                    </Link>
                 </div>
             </section>
-            
-            {/* 💡 CATEGORIES SECTION */}
-            <section className="py-20 px-4 mt-auto">
+
+            {/* ===== FEATURED PRODUCTS ===== */}
+            <section className="py-16 px-4 relative z-10">
                 <div className="container mx-auto max-w-7xl">
-                    <h2 className="text-3xl font-black text-slate-800 mb-10 text-center tracking-tight">Shop by Category</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                        {[
-                            { name: 'Zero Waste', color: 'from-emerald-50 to-emerald-100 text-emerald-800' },
-                            { name: 'Organic Apparel', color: 'from-sage-50 to-sage-100 text-sage-800' },
-                            { name: 'Upcycled Goods', color: 'from-blue-50 to-blue-100 text-blue-800' },
-                            { name: 'Renewable Energy', color: 'from-amber-50 to-amber-100 text-amber-800' }
-                        ].map((cat, idx) => (
-                            <Link 
-                                to={`/products?category=${encodeURIComponent(cat.name)}`} 
+                    <div className="flex justify-between items-end mb-8 pb-3 border-b border-[#27272A]">
+                        <div>
+                            <div className="flex items-center gap-2 text-[#F59E0B] text-xs uppercase mb-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+                                CURATED TELEMETRY
+                            </div>
+                            <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">Verified Sustainable Catalog</h2>
+                        </div>
+                        <Link to="/products" className="text-xs text-[#F59E0B] hover:text-[#FBBF24] transition-colors uppercase font-bold">
+                            VIEW ALL PRODUCTS →
+                        </Link>
+                    </div>
+
+                    {isLoading ? (
+                        <SkeletonGrid count={8} />
+                    ) : isError ? (
+                        <div className="bg-[#0d0d16] border border-rose-800 text-rose-400 p-8 rounded-2xl text-center text-xs">
+                            Couldn't load products. Please try again.
+                        </div>
+                    ) : products.length === 0 ? (
+                        <div className="bg-[#0d0d16] border border-[#27272A] text-zinc-400 p-12 rounded-2xl text-center text-xs">
+                            <p className="mb-4">No products yet.</p>
+                            <button onClick={() => navigate('/register')} className="btn-primary text-xs uppercase">
+                                LIST THE FIRST PRODUCT
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {products.map((product) => (
+                                <ProductCard key={product._id} product={product} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* ===== CATEGORIES ===== */}
+            <section className="py-16 px-4 bg-[#08080f] border-t border-b border-[#27272A] relative z-10">
+                <div className="container mx-auto max-w-7xl">
+                    <div className="mb-8">
+                        <div className="text-[#F59E0B] text-xs uppercase mb-1">CATEGORIES</div>
+                        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight">Catalog Categorization</h2>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {CATEGORIES.map((cat) => (
+                            <Link
+                                to={`/products?category=${encodeURIComponent(cat.name.toLowerCase())}`}
                                 key={cat.name}
-                                className={`bg-gradient-to-br ${cat.color} py-10 px-6 rounded-3xl hover:scale-105 transition-all duration-300 font-black text-lg soft-shadow border border-white/50 animate-fade-in-up`}
-                                style={{ animationDelay: `${0.1 * idx}s` }}
+                                className="bg-[#0d0d16] border border-[#27272A] hover:border-[#F59E0B] p-4 rounded-xl transition-all group"
                             >
-                                {cat.name}
+                                <div className="text-xs text-zinc-500 mb-1">{cat.code}</div>
+                                <div className="text-xs font-bold text-white group-hover:text-[#FBBF24] transition-colors">{cat.name}</div>
                             </Link>
                         ))}
                     </div>
@@ -163,3 +134,4 @@ const HomePage = () => {
 };
 
 export default HomePage;
+

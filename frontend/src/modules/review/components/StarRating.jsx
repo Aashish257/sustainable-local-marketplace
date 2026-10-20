@@ -4,9 +4,9 @@ const StarRating = ({ rating = 0, maxStars = 5, onRatingChange, readOnly = false
     const [hover, setHover] = useState(0);
 
     const sizes = {
-        sm: "w-4 h-4",
-        md: "w-6 h-6",
-        lg: "w-8 h-8"
+        sm: "w-3.5 h-3.5",
+        md: "w-5 h-5",
+        lg: "w-6 h-6"
     };
 
     return (
@@ -26,7 +26,7 @@ const StarRating = ({ rating = 0, maxStars = 5, onRatingChange, readOnly = false
                         onClick={() => !readOnly && onRatingChange(starValue)}
                     >
                         <svg
-                            className={`${sizes[size]} ${isActive ? 'text-yellow-400' : 'text-gray-300'} transition-colors duration-200`}
+                            className={`${sizes[size]} ${isActive ? 'text-[#F59E0B]' : 'text-zinc-700'} transition-colors duration-150`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             xmlns="http://www.w3.org/2000/svg"
@@ -41,3 +41,4 @@ const StarRating = ({ rating = 0, maxStars = 5, onRatingChange, readOnly = false
 };
 
 export default StarRating;
+

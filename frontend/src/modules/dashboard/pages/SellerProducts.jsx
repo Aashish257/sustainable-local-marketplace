@@ -1,3 +1,4 @@
+import { Leaf } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import apiClient from '../../../services/apiClient';
@@ -63,7 +64,7 @@ const SellerProducts = () => {
                 <div className="glass-card overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-xs text-left">
-                            <thead className="bg-black/[0.02] dark:bg-white/[0.02] text-[var(--text-muted)] border-b border-[var(--border-card)] uppercase tracking-wider text-[10px] font-mono font-bold">
+                            <thead className="bg-black/[0.02] dark:bg-white/[0.02] text-[var(--text-muted)] border-b border-[var(--border-card)] uppercase tracking-wider text-xs font-mono font-bold">
                                 <tr>
                                     <th className="px-6 py-3.5">Product</th>
                                     <th className="px-6 py-3.5 hidden md:table-cell">Category</th>
@@ -81,24 +82,24 @@ const SellerProducts = () => {
                                                     {p.images?.[0] ? (
                                                         <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-xs">🌿</div>
+                                                        <div className="w-full h-full flex items-center justify-center text-xs"><Leaf className="w-4 h-4" aria-hidden="true" /></div>
                                                     )}
                                                 </div>
                                                 <div>
                                                     <p className="font-bold text-[var(--text-main)] text-xs">{p.title}</p>
                                                     {!p.isApproved && (
-                                                        <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-mono font-semibold">Pending approval</span>
+                                                        <span className="text-xs px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-mono font-semibold">Pending approval</span>
                                                     )}
                                                     {p.biddingEnabled && (
                                                         <span className="inline-block mt-0.5 text-[9px] font-mono font-bold uppercase text-amber-600 dark:text-amber-400">
-                                                            ⚡ Live Auction
+                                                            Live auction
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-[var(--text-muted)] hidden md:table-cell">
-                                            <span className="glass px-2.5 py-1 rounded-full text-[10px]">
+                                            <span className="glass px-2.5 py-1 rounded-full text-xs">
                                                 {p.category}
                                             </span>
                                         </td>
@@ -107,24 +108,24 @@ const SellerProducts = () => {
                                         </td>
                                         <td className="px-6 py-4 hidden md:table-cell">
                                             {p.stock <= 0 ? (
-                                                <span className="text-rose-500 font-bold text-[10px] font-mono uppercase">Out of Stock</span>
+                                                <span className="text-rose-500 font-bold text-xs font-mono uppercase">Out of Stock</span>
                                             ) : (
-                                                <span className="text-emerald-600 dark:text-emerald-400 font-mono text-[10px]">
-                                                    {p.stock} units
+                                                <span className="text-emerald-600 dark:text-emerald-400 font-mono text-xs">
+                                                    {p.stock} in stock
                                                 </span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2 text-[10px]">
+                                            <div className="flex justify-end gap-2 text-xs">
                                                 <Link
                                                     to={`/products/${p._id}`}
-                                                    className="btn-secondary px-2.5 py-1 text-[10px] font-semibold"
+                                                    className="btn-secondary px-2.5 py-1 text-xs font-semibold"
                                                 >
                                                     View
                                                 </Link>
                                                 <Link
                                                     to={`/dashboard/products/edit/${p._id}`}
-                                                    className="btn-secondary px-2.5 py-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                                                    className="btn-secondary px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
                                                 >
                                                     Edit
                                                 </Link>

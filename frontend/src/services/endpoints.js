@@ -24,6 +24,7 @@ export const ORDERS = {
     CREATE: "/orders",
     MY: "/orders/my",
     SELLER: "/orders/seller",
+    GET_ONE: "/orders/:id",
 }
 
 export const PRODUCTS_MINE = "/products/mine";
@@ -35,6 +36,13 @@ export const PAYMENTS = {
 
 export const MESSAGES = {
     GET_HISTORY: "/messages/:receiverId",
+    CONVERSATIONS: "/messages/conversations",
+}
+
+export const CART = {
+    GET: "/cart",
+    ADD: "/cart",
+    REMOVE: "/cart",
 }
 
 export const BIDS = {

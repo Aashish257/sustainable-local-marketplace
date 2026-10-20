@@ -1,3 +1,4 @@
+import { Leaf } from 'lucide-react';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
@@ -45,18 +46,18 @@ const RegisterPage = () => {
                 {/* Logo */}
                 <div className="relative z-10 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-500 font-display font-black text-sm">
-                        🌿
+                        <Leaf className="w-4 h-4" aria-hidden="true" />
                     </div>
                     <div>
                         <span className="font-bold text-[var(--text-main)] text-lg tracking-tight font-display">SustainMarket</span>
-                        <div className="text-[var(--text-muted)] text-[10px] font-mono uppercase tracking-widest">COMMUNITY ENROLLMENT</div>
+                        <div className="text-[var(--text-muted)] text-xs font-mono uppercase tracking-widest">COMMUNITY ENROLLMENT</div>
                     </div>
                 </div>
 
                 {/* Main content */}
                 <div className="relative z-10 space-y-5">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-medium text-xs uppercase tracking-wider">
-                        <span>✦ CIRCULAR PARTICIPATION</span>
+                        <span>Join the marketplace</span>
                     </div>
                     <h2 className="text-4xl sm:text-5xl font-extrabold font-display leading-tight text-[var(--text-main)]">
                         Local Commerce, <br />
@@ -95,7 +96,7 @@ const RegisterPage = () => {
                     {/* Mobile logo */}
                     <div className="lg:hidden flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-500 font-display font-bold text-xs">
-                            🌿
+                            <Leaf className="w-4 h-4" aria-hidden="true" />
                         </div>
                         <span className="font-bold text-lg font-display text-[var(--text-main)]">SustainMarket</span>
                     </div>
@@ -126,7 +127,7 @@ const RegisterPage = () => {
                                             }`}
                                     >
                                         <div className="font-bold text-[var(--text-main)] text-xs font-display">{r.label}</div>
-                                        <div className="text-[var(--text-muted)] text-[10px] mt-1 font-sans leading-tight">{r.desc}</div>
+                                        <div className="text-[var(--text-muted)] text-xs mt-1 font-sans leading-tight">{r.desc}</div>
                                     </button>
                                 ))}
                             </div>
@@ -224,7 +225,7 @@ const RegisterPage = () => {
                         </button>
                     </form>
 
-                    <p className="text-center font-mono text-[10px] text-[var(--text-muted)]">
+                    <p className="text-center font-mono text-xs text-[var(--text-muted)]">
                         BY JOINING YOU COMMIT TO ETHICAL, LOCAL SUSTAINABILITY PRINCIPLES
                     </p>
                 </div>

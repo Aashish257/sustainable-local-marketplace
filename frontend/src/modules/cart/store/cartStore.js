@@ -7,15 +7,16 @@ export const useCartStore = create(
             // 1. Initial State
             cart: [],
 
-            // 2. Add to Cart (from yesterday, unchanged logic)
-            addToCart: (product) => set((state) => {
+            // 2. Add to Cart with optional quantity
+            addToCart: (product, qty = 1) => set((state) => {
+                const addQty = Math.max(1, qty);
                 const existingItem = state.cart.find(item => item._id === product._id);
 
                 if (existingItem) {
                     return {
                         cart: state.cart.map(item =>
                             item._id === product._id
-                                ? { ...item, quantity: item.quantity + 1 }
+                                ? { ...item, quantity: item.quantity + addQty }
                                 : item
                         )
                     };
@@ -27,7 +28,7 @@ export const useCartStore = create(
                         title: product.title,
                         price: product.price,
                         image: product.image || product.images?.[0] || null,
-                        quantity: 1
+                        quantity: addQty
                     }]
                 };
             }),

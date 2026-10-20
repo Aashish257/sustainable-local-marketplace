@@ -25,38 +25,42 @@ const ReviewForm = ({ productId }) => {
 
     if (!isAuthenticated) {
         return (
-            <div className="bg-green-50 p-8 rounded-2xl border border-green-100 text-center mb-12">
-                <h3 className="text-xl font-bold text-green-800 mb-2">Want to share your experience?</h3>
-                <p className="text-green-600 mb-6">Please log in to leave a review for this sustainable product.</p>
+            <div className="bg-[#0d0d16] p-6 rounded-2xl border border-[#27272A] text-center mb-8 font-mono">
+                <h3 className="text-sm font-bold text-white mb-1 uppercase">LEAVE AUDITED FEEDBACK</h3>
+                <p className="text-xs text-zinc-500 mb-4 font-sans">Authenticate identity claims to submit a verified product audit review.</p>
                 <Link 
                     to="/login" 
-                    className="inline-block bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition-all shadow-lg hover:shadow-green-200"
+                    className="btn-primary inline-flex items-center gap-2 text-xs uppercase"
                 >
-                    Login to Review
+                    AUTHENTICATE TO REVIEW →
                 </Link>
             </div>
         );
     }
 
     return (
-        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-xl mb-12 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-2 h-full bg-green-500"></div>
+        <div className="bg-[#0d0d16] p-6 rounded-2xl border border-[#27272A] mb-8 font-mono">
+            <div className="flex items-center justify-between pb-3 mb-5 border-b border-[#27272A]">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
+                    WRITE A REVIEW
+                </h3>
+                <span className="text-xs text-zinc-500">PEER VERIFICATION</span>
+            </div>
             
-            <h3 className="text-2xl font-bold mb-6 text-gray-800">Write a Review</h3>
-            
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Overall Rating</label>
-                    <StarRating rating={rating} onRatingChange={setRating} size="lg" />
-                    {rating === 0 && <p className="text-xs text-gray-400 mt-2 italic">* Click a star to rate</p>}
+                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1.5">RATING SCORE</label>
+                    <StarRating rating={rating} onRatingChange={setRating} size="md" />
+                    {rating === 0 && <p className="text-xs text-zinc-500 mt-1.5 font-sans">* Select star rating 1 to 5</p>}
                 </div>
 
                 <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Your Experience</label>
+                    <label className="block text-xs font-bold text-zinc-400 uppercase mb-1.5">EXPERIENCE &amp; VERIFICATION LOG</label>
                     <textarea
-                        rows="4"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all outline-none resize-none"
-                        placeholder="What did you love about this product? Was it truly sustainable?"
+                        rows="3"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-[#020206] border border-[#27272A] text-white font-sans text-xs focus:border-[#F59E0B] focus:outline-none transition-all resize-none leading-relaxed"
+                        placeholder="Detail materials, build quality, delivery packaging sustainability, and usage lifespan..."
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         required
@@ -64,23 +68,23 @@ const ReviewForm = ({ productId }) => {
                 </div>
 
                 {error && (
-                    <div className="p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
-                        {error.response?.data?.message || "Failed to submit review. You may have already reviewed this product."}
+                    <div className="p-3 bg-rose-950/40 text-rose-400 border border-rose-800 rounded-lg text-xs font-bold">
+                        {error.response?.data?.error || "Failed to submit review. You may have already reviewed this product."}
                     </div>
                 )}
 
                 {isSuccess && (
-                    <div className="p-4 bg-green-50 text-green-600 rounded-xl text-sm font-medium animate-bounce">
-                        🎉 Review submitted successfully!
+                    <div className="p-3 bg-emerald-950/40 text-emerald-400 border border-emerald-800 rounded-lg text-xs font-bold flex items-center gap-2">
+                        <span>✓</span> Review published to catalog!
                     </div>
                 )}
 
                 <button
                     type="submit"
                     disabled={rating === 0 || isPending}
-                    className="w-full sm:w-auto bg-gray-900 text-white px-10 py-4 rounded-xl font-bold hover:bg-black transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed transform active:scale-95"
+                    className="btn-primary text-xs uppercase px-5 py-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                 >
-                    {isPending ? "Submitting..." : "Post Review"}
+                    {isPending ? "SIGNING AUDIT…" : "PUBLISH REVIEW →"}
                 </button>
             </form>
         </div>
@@ -88,3 +92,4 @@ const ReviewForm = ({ productId }) => {
 };
 
 export default ReviewForm;
+

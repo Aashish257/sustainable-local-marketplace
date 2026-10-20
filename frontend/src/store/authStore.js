@@ -5,7 +5,7 @@ import { useCartStore } from "../modules/cart/store/cartStore";
 import useNotificationStore from "./notificationStore";
 
 const useAuthStore = create(
-    persist((set) => ({
+    persist((set, get) => ({
         user: null,
         token: null,
         isAuthenticated: false,
@@ -14,12 +14,22 @@ const useAuthStore = create(
             set({ user, token, isAuthenticated: true });
         },
         logout: () => {
+            // Revoke the token on the server (bumps tokenVersion). Plain fetch, not apiClient:
+            // avoids a circular import and the 401 redirect if the token is already invalid.
+            const token = get().token;
+            if (token) {
+                fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${token}` },
+                }).catch(() => {});
+            }
+
             disconnectSocket(); // Clean disconnect on logout
-            
-            // Clear other stores
+
+            // Clear other stores (local only: notifications stay saved on the server)
             useCartStore.getState().clearCart();
-            useNotificationStore.getState().clearAll();
-            
+            useNotificationStore.getState().reset();
+
             set({ user: null, token: null, isAuthenticated: false });
         },
     }), {
@@ -27,4 +37,4 @@ const useAuthStore = create(
     })
 )
 
-export default useAuthStore;
+export default useAuthStore;

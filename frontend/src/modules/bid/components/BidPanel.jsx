@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import socket from '../../../services/socket';
 import { getHighestBid } from '../services/bidService';
 import useAuthStore from '../../../store/authStore';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Gavel, Clock } from 'lucide-react';
+import apiClient from '../../../services/apiClient';
 
 // 93784000 ms -> "1d 02:03:04"
 const formatTimeLeft = (ms) => {
@@ -21,6 +23,20 @@ const BidPanel = ({ product }) => {
     const [isConnected, setIsConnected] = useState(socket.connected);
     const { isAuthenticated, user } = useAuthStore();
     const myId = user?._id || user?.id;
+    const navigate = useNavigate();
+    const [paying, setPaying] = useState(false);
+
+    // Winner checkout: backend creates (or re-opens) one order at the winning price
+    const handlePayNow = async () => {
+        setPaying(true);
+        try {
+            const res = await apiClient.post(`/orders/auction/${productId}`);
+            navigate(`/payment/${res.data.data._id}`);
+        } catch (err) {
+            setMessage({ text: err.response?.data?.error || 'Could not start checkout', type: 'error' });
+            setPaying(false);
+        }
+    };
 
     // Auction end state: from the product on load, then live via 'auction_closed'
     const [auction, setAuction] = useState({
@@ -29,7 +45,7 @@ const BidPanel = ({ product }) => {
         amount: product?.currentBid ?? null,
     });
     const endTime = product?.biddingEndTime ? new Date(product.biddingEndTime).getTime() : null;
-    const [now, setNow] = useState(Date.now());
+    const [now, setNow] = useState(() => Date.now());
 
     // Countdown tick (stops once the auction is closed)
     useEffect(() => {
@@ -116,125 +132,127 @@ const BidPanel = ({ product }) => {
 
     const isValidBid = parseFloat(bidInput) > minBid;
 
+    const fmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+
     return (
-        <div className="bg-[#0d0d16] rounded-2xl border border-[#27272A] p-6 shadow-xl space-y-5">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <h3 className="font-mono text-sm font-bold text-white flex items-center gap-2 uppercase tracking-wider">
-                    <span className="w-2 h-2 rounded-full bg-[#F59E0B] animate-pulse" />
-                    LIVE AUCTION ENGINE
+        <section aria-labelledby="auction-title" className="glass-card p-6 space-y-5">
+            {/* Header: title + connection status (text, not colour only) */}
+            <div className="flex items-center justify-between gap-3">
+                <h3 id="auction-title" className="font-display text-lg font-bold text-[var(--text-main)] flex items-center gap-2">
+                    <Gavel className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                    Live auction
                 </h3>
-                <span className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold px-2.5 py-1 rounded border ${
-                    isConnected ? 'bg-emerald-950/40 text-emerald-400 border-emerald-800' : 'bg-amber-950/40 text-amber-400 border-amber-800'
+                <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full ${
+                    isConnected ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-amber-500/10 text-amber-700 dark:text-amber-400'
                 }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-400 animate-ping' : 'bg-amber-400'}`} />
-                    {isConnected ? 'SOCKET // CONNECTED' : 'SOCKET // RECONNECTING'}
+                    <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-500' : 'bg-amber-500'}`} aria-hidden="true" />
+                    {isConnected ? 'Live updates on' : 'Reconnecting…'}
                 </span>
             </div>
 
-            {/* Current Bid Display */}
-            <div className="bg-[#020206] rounded-xl p-5 text-center border border-[#27272A]">
-                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">HIGHEST ACTIVE BID</p>
+            {/* Current bid */}
+            <div className="rounded-xl p-5 text-center bg-[var(--bg-surface-elevated)] border border-[var(--border-card)]">
+                <p className="text-xs font-medium text-[var(--text-muted)] mb-1">
+                    {currentBid ? 'Current highest bid' : 'Starting price'}
+                </p>
                 {isLoading ? (
-                    <p className="text-2xl font-mono font-bold text-[#F59E0B] animate-pulse">SYNCING FEED...</p>
+                    <p className="text-3xl font-bold text-[var(--text-subtle)] animate-pulse">Loading…</p>
                 ) : (
-                    <>
-                        <p className="text-4xl font-mono font-black text-[#F59E0B] tracking-tight">
-                            ₹{currentBid ? currentBid.amount.toLocaleString() : basePrice.toLocaleString()}
-                        </p>
-                        <p className="text-xs font-mono text-zinc-500 mt-1">
-                            {currentBid ? `Base floor price: ₹${basePrice.toLocaleString()}` : 'No bids placed yet — open bidding below'}
-                        </p>
-                    </>
+                    <p className="text-4xl font-bold font-mono text-[var(--text-main)]" aria-live="polite">
+                        {fmt(currentBid ? currentBid.amount : basePrice)}
+                    </p>
+                )}
+                {currentBid && (
+                    <p className="text-xs text-[var(--text-muted)] mt-1">Starting price {fmt(basePrice)}</p>
+                )}
+                {/* Countdown: amber is reserved for urgency (spec 0.1) and always paired with text */}
+                {endTime && !hasEnded && (
+                    <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 dark:text-amber-400">
+                        <Clock className="w-4 h-4" aria-hidden="true" />
+                        Ends in <span className="font-mono">{formatTimeLeft(timeLeft)}</span>
+                    </p>
                 )}
             </div>
 
-            {/* Countdown */}
-            {endTime && !hasEnded && (
-                <p className="text-center text-xs font-mono text-zinc-400">
-                    ENDS IN <span className="text-[#F59E0B] font-bold">{formatTimeLeft(timeLeft)}</span>
+            {/* Result once the auction has ended */}
+            {hasEnded && (
+                <div aria-live="polite" className="rounded-xl p-4 text-center border border-[var(--border-card)] space-y-2">
+                    <p className="text-sm font-semibold text-[var(--text-main)]">Auction closed</p>
+                    <p className="text-sm text-[var(--text-muted)]">
+                        {!auction.closed
+                            ? 'Finalising the result…'
+                            : auction.winnerId && auction.winnerId === myId
+                                ? `You won at ${fmt(auction.amount)}`
+                                : auction.winnerId
+                                    ? `Sold for ${fmt(auction.amount)}`
+                                    : 'Ended with no bids'}
+                    </p>
+                    {auction.closed && auction.winnerId && auction.winnerId === myId && (
+                        <button type="button" onClick={handlePayNow} disabled={paying} className="btn-primary w-full py-2.5 text-sm">
+                            {paying ? 'Opening checkout…' : `Pay ${fmt(auction.amount)} now`}
+                        </button>
+                    )}
+                </div>
+            )}
+
+            {/* Feedback from the last action */}
+            {message && (
+                <p role={message.type === 'error' ? 'alert' : 'status'} className={`px-4 py-2.5 rounded-lg text-sm text-center ${
+                    message.type === 'success'
+                        ? 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300'
+                        : 'bg-rose-500/10 text-rose-700 dark:text-rose-300'
+                }`}>
+                    {message.text}
                 </p>
             )}
 
-            {/* Auction ended banner (aria-live so screen readers announce the result) */}
-            {hasEnded && (
-                <div aria-live="polite" className="rounded-xl p-4 text-center border border-[#27272A] bg-[#020206] space-y-1">
-                    <p className="text-xs font-mono font-bold text-zinc-300 uppercase tracking-wider">Auction closed</p>
-                    <p className="text-sm font-mono text-[#F59E0B]">
-                        {!auction.closed
-                            ? 'Finalising result…'
-                            : auction.winnerId && auction.winnerId === myId
-                                ? `🏆 You won at ₹${auction.amount?.toLocaleString()}`
-                                : auction.winnerId
-                                    ? `Sold for ₹${auction.amount?.toLocaleString()}`
-                                    : 'Ended with no bids'}
-                    </p>
-                </div>
-            )}
-
-            {/* Feedback Message */}
-            {message && (
-                <div className={`px-4 py-2.5 rounded-lg text-xs font-mono text-center animate-fade-in ${
-                    message.type === 'success' ? 'bg-emerald-950/40 text-emerald-300 border border-emerald-800' : 'bg-rose-950/40 text-rose-300 border border-rose-800'
-                }`}>
-                    {message.text}
-                </div>
-            )}
-
-            {/* Quick increment buttons */}
-            {isAuthenticated && !hasEnded && (
-                <div>
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase mb-2">QUICK STEP INCREMENT:</p>
-                    <div className="grid grid-cols-3 gap-2">
-                        {[50, 100, 250].map((inc) => (
-                            <button
-                                key={inc}
-                                type="button"
-                                onClick={() => handleQuickAdd(inc)}
-                                className="py-2 px-3 rounded-lg bg-[#181826] hover:bg-[#F59E0B]/10 hover:text-[#FBBF24] hover:border-[#F59E0B] text-zinc-300 border border-[#27272A] font-mono font-bold text-xs transition-all cursor-pointer"
-                            >
-                                +₹{inc}
-                            </button>
-                        ))}
+            {/* Bidding form */}
+            {!hasEnded && (isAuthenticated ? (
+                <form onSubmit={handlePlaceBid} className="space-y-3">
+                    <div>
+                        <p className="text-xs font-medium text-[var(--text-muted)] mb-2">Quick add</p>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[50, 100, 250].map((inc) => (
+                                <button
+                                    key={inc}
+                                    type="button"
+                                    onClick={() => handleQuickAdd(inc)}
+                                    className="btn-secondary py-2.5 text-sm font-mono"
+                                    aria-label={`Set bid to ${fmt((minBid || 0) + inc)}`}
+                                >
+                                    +{fmt(inc)}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
-
-            {/* Bid Input */}
-            {hasEnded ? null : isAuthenticated ? (
-                <form onSubmit={handlePlaceBid} className="space-y-2">
+                    <label htmlFor="bid-amount" className="block text-xs font-medium text-[var(--text-muted)]">
+                        Your bid (more than {fmt(minBid)})
+                    </label>
                     <div className="flex gap-2">
                         <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-mono font-bold text-xs">₹</span>
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-subtle)] text-sm" aria-hidden="true">₹</span>
                             <input
+                                id="bid-amount"
                                 type="number"
+                                inputMode="numeric"
                                 value={bidInput}
-                                onChange={e => setBidInput(e.target.value)}
-                                placeholder={`Min: ₹${(minBid + 1).toLocaleString()}`}
+                                onChange={(e) => setBidInput(e.target.value)}
+                                placeholder={(minBid + 1).toLocaleString('en-IN')}
                                 min={minBid + 1}
-                                className="w-full pl-7 pr-3 py-2.5 bg-[#020206] border border-[#27272A] rounded-lg text-xs font-mono text-white focus:outline-none focus:border-[#F59E0B]"
+                                className="w-full pl-7 pr-3 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-sm font-mono text-[var(--text-main)] focus:outline-none focus:border-emerald-500"
                             />
                         </div>
-                        <button
-                            type="submit"
-                            disabled={!isValidBid}
-                            className="btn-primary px-5 py-2.5 text-xs font-mono font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                            SUBMIT BID
+                        <button type="submit" disabled={!isValidBid} className="btn-primary px-5 py-2.5 text-sm">
+                            Place bid
                         </button>
                     </div>
-                    <p className="text-[10px] font-mono text-zinc-500 text-center">
-                        Minimum bid must exceed ₹{minBid.toLocaleString()}
-                    </p>
                 </form>
             ) : (
-                <div className="text-center py-2">
-                    <Link to="/login" className="font-mono text-xs text-[#F59E0B] hover:underline">
-                        AUTHENTICATE TO PARTICIPATE IN AUCTION →
-                    </Link>
-                </div>
-            )}
-        </div>
+                <Link to="/login" className="btn-primary block text-center py-2.5 text-sm">
+                    Sign in to place a bid
+                </Link>
+            ))}
+        </section>
     );
 };
 

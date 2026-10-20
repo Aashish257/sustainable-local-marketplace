@@ -3,27 +3,27 @@ import StarRating from './StarRating';
 
 const ReviewItem = ({ review }) => {
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString('en-IN', {
             year: 'numeric',
-            month: 'long',
+            month: 'short',
             day: 'numeric'
         });
     };
 
     return (
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 mb-4">
-            <div className="flex justify-between items-start mb-4">
+        <div className="bg-[#0d0d16] p-4 rounded-xl border border-[#27272A] font-mono space-y-2">
+            <div className="flex justify-between items-start">
                 <div>
-                    <h4 className="font-bold text-gray-800 text-lg">
-                        {review.userId?.name || "Anonymous Buyer"}
+                    <h4 className="font-bold text-white text-xs">
+                        {review.userId?.name || "ANONYMOUS BUYER"}
                     </h4>
-                    <p className="text-sm text-gray-400 font-medium">
+                    <p className="text-xs text-zinc-500">
                         {formatDate(review.createdAt)}
                     </p>
                 </div>
                 <StarRating rating={review.rating} readOnly size="sm" />
             </div>
-            <p className="text-gray-600 leading-relaxed italic">
+            <p className="text-zinc-400 font-sans text-xs leading-relaxed italic">
                 "{review.comment}"
             </p>
         </div>
@@ -31,3 +31,4 @@ const ReviewItem = ({ review }) => {
 };
 
 export default ReviewItem;
+

@@ -94,7 +94,7 @@ const Navbar = () => {
                                 <span className="text-base font-black font-display tracking-tight text-[var(--text-main)] block leading-none">
                                     Sustain<span className="text-emerald-600 dark:text-emerald-400">Market</span>
                                 </span>
-                                <span className="text-[10px] font-mono tracking-wider text-[var(--text-muted)] block uppercase mt-0.5">
+                                <span className="text-xs font-mono tracking-wider text-[var(--text-muted)] block uppercase mt-0.5">
                                     Local Verified
                                 </span>
                             </div>
@@ -189,7 +189,7 @@ const Navbar = () => {
                                         <div className="absolute right-0 mt-2 w-80 glass-card p-4 shadow-xl z-50 animate-in fade-in zoom-in-95">
                                             <div className="flex items-center justify-between border-b border-[var(--border-card)] pb-2 mb-3">
                                                 <span className="text-xs font-bold font-display text-[var(--text-main)]">Notifications</span>
-                                                <Link to="/notifications" onClick={() => setBellOpen(false)} className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline">
+                                                <Link to="/notifications" onClick={() => setBellOpen(false)} className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline">
                                                     View All
                                                 </Link>
                                             </div>
@@ -236,7 +236,7 @@ const Navbar = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                                 </svg>
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-emerald-600 text-white font-mono text-[10px] font-bold">
+                                    <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full bg-emerald-600 text-white font-mono text-xs font-bold">
                                         {cartCount}
                                     </span>
                                 )}
@@ -248,7 +248,7 @@ const Navbar = () => {
                                     to="/dashboard"
                                     className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold hover:bg-emerald-600 hover:text-white transition-all"
                                 >
-                                    <span>STUDIO</span>
+                                    <span>SELLER</span>
                                 </Link>
                             )}
 
@@ -257,7 +257,7 @@ const Navbar = () => {
                                     to="/admin"
                                     className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-mono text-xs font-bold hover:bg-amber-500 hover:text-[#041c15] transition-all"
                                 >
-                                    <span>GOVERN</span>
+                                    <span>ADMIN</span>
                                 </Link>
                             )}
 
@@ -277,7 +277,7 @@ const Navbar = () => {
                                         <div className="absolute right-0 mt-2 w-48 glass-card p-2 shadow-xl z-50 text-xs">
                                             <div className="px-3 py-2 border-b border-[var(--border-card)] mb-1">
                                                 <p className="font-bold text-[var(--text-main)] truncate">{user?.name}</p>
-                                                <p className="text-[10px] text-[var(--text-muted)] font-mono truncate">{user?.email}</p>
+                                                <p className="text-xs text-[var(--text-muted)] font-mono truncate">{user?.email}</p>
                                             </div>
 
                                             <Link
@@ -311,7 +311,7 @@ const Navbar = () => {
                                                     onClick={() => setUserMenuOpen(false)}
                                                     className="block px-3 py-2 rounded-md text-amber-600 dark:text-amber-400 font-bold hover:bg-amber-500/10"
                                                 >
-                                                    Governance Admin
+                                                    Admin
                                                 </Link>
                                             )}
 
@@ -326,10 +326,10 @@ const Navbar = () => {
                                 </div>
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    <Link to="/login" className="px-3 py-1.5 text-xs font-semibold text-[var(--text-main)] hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                                    <Link to="/login" className="hidden sm:inline-block whitespace-nowrap px-3 py-1.5 text-xs font-semibold text-[var(--text-main)] hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                                         Sign In
                                     </Link>
-                                    <Link to="/register" className="btn-primary px-3.5 py-1.5 text-xs font-semibold">
+                                    <Link to="/register" className="btn-primary whitespace-nowrap px-3.5 py-1.5 text-xs font-semibold">
                                         Join
                                     </Link>
                                 </div>
@@ -376,6 +376,12 @@ const Navbar = () => {
                         <Link to="/about" className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
                             About Mission
                         </Link>
+                        {/* On phones the top bar only has room for "Join", so sign-in lives here */}
+                        {!token && (
+                            <Link to="/login" onClick={() => setMobileOpen(false)} className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
+                                Sign in
+                            </Link>
+                        )}
                         {token && (
                             <>
                                 <Link to="/orders" className="block py-2 text-[var(--text-main)] hover:text-emerald-500 font-medium">
@@ -399,7 +405,7 @@ const Navbar = () => {
                         )}
                         {user?.role === 'admin' && (
                             <Link to="/admin" className="block py-2 text-amber-600 dark:text-amber-400 font-bold">
-                                Governance Admin Portal →
+                                Admin dashboard →
                             </Link>
                         )}
                     </div>
