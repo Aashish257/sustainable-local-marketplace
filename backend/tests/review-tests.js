@@ -64,8 +64,8 @@ async function runTests() {
     console.log("\n🚀 RUNNING REVIEW SYSTEM TESTS\n" + "═".repeat(40));
 
     // 1. Setup Data: Register Buyer and Seller
-    await post("/api/auth/register", { name: "Buyer One", email: "buyer@test.com", password: "password", role: "buyer" });
-    await post("/api/auth/register", { name: "Seller One", email: "seller@test.com", password: "password", role: "seller" });
+    await post("/api/auth/register", { name: "Buyer One", email: "buyer@test.com", password: "password", role: "buyer", consent: true });
+    await post("/api/auth/register", { name: "Seller One", email: "seller@test.com", password: "password", role: "seller", consent: true });
 
     // Get the objects for product creation
     const buyer = await User.findOne({ email: "buyer@test.com" });
@@ -73,6 +73,7 @@ async function runTests() {
 
     const product = await Product.create({ 
         title: "Eco Bottle", 
+        description: "Beautiful and clean Eco Bottle for everyday hydration.",
         price: 20, 
         sellerId: seller._id, 
         category: "Home", 
@@ -92,7 +93,7 @@ async function runTests() {
             rating: 5,
             comment: "Great eco-friendly bottle!"
         }, token);
-        log("TEST 1 — Create Review WITHOUT Purchase", status, data, 500); // 500 if using standard error handler with throw Error
+        log("TEST 1 — Create Review WITHOUT Purchase", status, data, 403);
     }
 
     // 2. Create a PAID order
@@ -120,7 +121,7 @@ async function runTests() {
             rating: 4,
             comment: "Wait, I already reviewed this."
         }, token);
-        log("TEST 3 — Create Duplicate Review", status, data, 500);
+        log("TEST 3 — Create Duplicate Review", status, data, 403);
     }
 
     // TEST 4 — Get Reviews

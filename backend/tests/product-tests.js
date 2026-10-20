@@ -84,6 +84,7 @@ async function runTests() {
             name: "Seller A",
             email: "seller_a@test.com",
             password: "password123",
+            consent: true,
             role: "seller"
         });
         const { data } = await request("/api/auth/login", "POST", {
@@ -99,6 +100,7 @@ async function runTests() {
             name: "Buyer B",
             email: "buyer_b@test.com",
             password: "password123",
+            consent: true,
             role: "buyer"
         });
         const { data } = await request("/api/auth/login", "POST", {
@@ -112,6 +114,7 @@ async function runTests() {
     {
         const { status, data } = await request("/api/products", "POST", {
             title: "Sustainable Bamboo Kit",
+            description: "Perfect eco-friendly starter kit for bamboo lovers.",
             price: 25.50,
             category: "lifestyle",
             stock: 50,
@@ -162,6 +165,7 @@ async function runTests() {
             name: "Seller B",
             email: "seller_b@test.com",
             password: "password123",
+            consent: true,
             role: "seller"
         });
         const { data: loginData } = await request("/api/auth/login", "POST", {

@@ -12,9 +12,14 @@ export const registerService = async (data) => {
 
     const hashed = await hashPassword(data.password);
 
+    // Pick fields explicitly so clients cannot set extra fields on the user
     const user = await createUser({
-        ...data,
+        name: data.name,
+        email: data.email,
+        role: data.role,
         password: hashed,
+        consentGiven: true,
+        consentAt: new Date(),
     });
 
     return { id: user._id };
@@ -41,4 +46,4 @@ export const loginService = async ({ email, password }) => {
             role: user.role 
         } 
     };
-};
+};

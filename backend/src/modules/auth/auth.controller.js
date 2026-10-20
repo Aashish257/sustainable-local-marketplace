@@ -27,3 +27,11 @@ export const login = async (req, res, next) => {
         next(err);
     }
 };
+
+export const logout = async (req, res) => {
+    res.json({ success: true, message: "Logged out successfully" });
+};
+
+export const getMe = async (req, res) => {
+    res.json({ success: true, data: req.user });
+};

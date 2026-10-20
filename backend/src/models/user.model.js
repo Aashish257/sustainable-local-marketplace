@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema(
             enum: ["buyer", "seller", "admin"],
             default: "buyer",
         },
+
+        // Privacy consent captured at signup (DPDP / GDPR style audit trail)
+        consentGiven: { type: Boolean, default: false },
+        consentAt: { type: Date },
     },
     { timestamps: true }
 );
