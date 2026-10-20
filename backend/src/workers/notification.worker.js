@@ -12,6 +12,7 @@ const connection = {
 let notificationWorker;
 
 try {
+    if (process.env.DISABLE_REDIS === "true") throw new Error("DISABLE_REDIS=true");
     // 1. Create the Worker
     notificationWorker = new Worker(
         "notifications",

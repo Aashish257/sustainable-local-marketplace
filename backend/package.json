@@ -6,7 +6,9 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
   "dependencies": {
     "@socket.io/redis-adapter": "^8.3.0",
@@ -27,8 +29,32 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "mongodb-memory-server": "^11.0.1",
     "nodemon": "^3.1.0",
-    "socket.io-client": "^4.8.3"
+    "socket.io-client": "^4.8.3",
+    "supertest": "^7.1.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "testMatch": [
+      "<rootDir>/tests/jest/**/*.test.js"
+    ],
+    "setupFiles": [
+      "<rootDir>/tests/jest/setup-env.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js",
+      "!src/scripts/**"
+    ],
+    "coverageReporters": [
+      "text-summary",
+      "text",
+      "lcov"
+    ],
+    "testTimeout": 30000,
+    "coverageProvider": "v8"
   }
 }

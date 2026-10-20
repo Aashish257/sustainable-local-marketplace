@@ -7,6 +7,7 @@ const logFormat = winston.format.printf(({ level, message, timestamp }) => {
 
 // Create Global Logger (Requirement 7)
 const logger = winston.createLogger({
+    silent: process.env.NODE_ENV === "test", // keep test output readable
     level: "info",
     format: winston.format.combine(
         winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
