@@ -67,6 +67,7 @@ const seedProducts = [
         images: ["https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=800&auto=format&fit=crop"],
         sustainabilityScore: 8.2,
         biddingEnabled: true,
+        biddingEndTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // demo auction runs for 7 days from seeding
         basePrice: 4000,
     },
     {

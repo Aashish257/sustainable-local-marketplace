@@ -70,6 +70,9 @@ const productSchema = new mongoose.Schema(
         // Live auction state, updated atomically by bid.service.js
         currentBid: { type: Number, default: null },
         currentBidder: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+        // Set once by the auction scheduler when biddingEndTime passes
+        auctionClosed: { type: Boolean, default: false },
+        auctionWinner: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
         // Moderation: new listings stay hidden until an admin approves them
         isApproved: { type: Boolean, default: false, index: true },
         isActive: { type: Boolean, default: true }
