@@ -15,5 +15,7 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.js'],
     include: ['src/**/*.test.{js,jsx}'],
     css: false,
+    // 8 parallel jsdom workers time out starting on busy dev machines; 4 is reliable
+    maxWorkers: 4,
   },
 })
