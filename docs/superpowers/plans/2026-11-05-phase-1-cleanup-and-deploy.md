@@ -212,8 +212,9 @@ Steps marked **Owner** need the owner's browser and accounts. Claude gives exact
 Verify: `curl -s https://<render-app>.onrender.com/` returns the health JSON with HTTP 200.
 - [ ] **Step 4 (Owner): Vercel → import the repo, root directory `frontend`.** Env: `VITE_API_BASE_URL=https://<render-app>.onrender.com/api`, `VITE_SOCKET_URL=https://<render-app>.onrender.com`. Then set Render `CLIENT_URL` to the Vercel URL and redeploy Render.
 - [ ] **Step 5: Seed production once and create the owner admin**
-Run locally with the Atlas URI in the shell (never in a file that gets committed): `cd backend && MONGO_URI="…" node src/scripts/seed.js`, then `MONGO_URI="…" ADMIN_EMAIL=… ADMIN_PASSWORD=… ADMIN_NAME=… node src/scripts/create-admin.js` (the owner types the values).
+Run locally with the Atlas URI in the shell (never in a file that gets committed): `cd backend && MONGO_URI="…" node src/scripts/seed.js` (safe to re-run: it resets only demo data), then `MONGO_URI="…" ADMIN_EMAIL=… ADMIN_PASSWORD=… ADMIN_NAME=… node src/scripts/create-admin.js` (the owner types the values).
 - [ ] **Step 6 (Owner): Add the GitHub repository variable `API_HEALTH_URL`** = the Render URL, then run the keep-alive workflow once by hand.
+- [ ] **Step 6b (Owner): Add the GitHub repository secret `MONGO_URI`** (the Atlas URI), then run the "Reset public demo data" workflow once by hand. Expected: "Demo reset: 3 demo accounts, 8 products".
 Expected: green run.
 - [ ] **Step 7: Smoke test the live site** (Playwright against the Vercel URL, or by hand)
   - Guest: home, marketplace and a product page load. The first load shows the waking-up notice if the server was asleep.
