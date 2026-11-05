@@ -9,6 +9,9 @@ vi.mock('../../services/socket', () => ({
     disconnectSocket: vi.fn(),
 }));
 
+// jsdom has no WebGL; the 3D background is decoration, not under test
+vi.mock('../../shared/components/ThreeAuthBackground', () => ({ default: () => null }));
+
 import LoginPage from './LoginPage';
 
 describe('LoginPage demo accounts', () => {
