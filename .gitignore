@@ -137,3 +137,8 @@ audit Report/
 .agents/
 .arena/
 
+
+# Local tooling output
+.superpowers/
+graphify-out/
+frontend/dist-e2e/

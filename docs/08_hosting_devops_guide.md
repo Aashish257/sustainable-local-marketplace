@@ -634,7 +634,7 @@ docker-compose up -d
 docker-compose logs -f api
 
 # Seed database
-docker-compose exec api node seed.js
+docker-compose exec api node src/scripts/seed.js
 
 # Stop all
 docker-compose down
@@ -742,7 +742,7 @@ Alert condition:  status !== 200
 [ ] 12.  First deploy triggered (check Render build logs — must show "Server running on port 5000")
 [ ] 13.  Health check: GET https://api.sustainlocal.in/api/health → HTTP 200
          Response must show: { "checks": { "mongodb": "ok" } }
-[ ] 14.  Seed database: node backend/seed.js (admin + test users + sample products)
+[ ] 14.  Seed database: node backend/src/scripts/seed.js (admin + test users + sample products)
 [ ] 15.  Backend smoke test via curl or Postman:
          POST /api/auth/register → 201 ✅
          POST /api/auth/login    → 200 with token ✅
