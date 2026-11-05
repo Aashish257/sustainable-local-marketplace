@@ -110,6 +110,30 @@ describe("NFR-SEC Payment signature in production", () => {
         await expect(verify("mock_x")).rejects.toMatchObject({ status: 400 });
     });
 
+    describe("public demo sandbox", () => {
+        afterEach(() => { delete process.env.PAYMENT_SANDBOX; });
+
+        it("production + PAYMENT_SANDBOX=true accepts a mock payment", async () => {
+            process.env.PAYMENT_SANDBOX = "true";
+            const buyer = await makeUser("buyer");
+            const seller = await makeUser("seller");
+            const p = await makeProduct(seller.user._id);
+            const o = await order(buyer.user._id, p._id);
+
+            await expect(verifyPaymentService(mockPay(o._id))).resolves.toBeDefined();
+            expect((await Order.findById(o._id)).status).toBe("paid");
+        });
+
+        it("production without PAYMENT_SANDBOX rejects a mock payment", async () => {
+            const buyer = await makeUser("buyer");
+            const seller = await makeUser("seller");
+            const p = await makeProduct(seller.user._id);
+            const o = await order(buyer.user._id, p._id);
+
+            await expect(verifyPaymentService(mockPay(o._id))).rejects.toMatchObject({ status: 400 });
+        });
+    });
+
     it("rejects a short forged signature with 400 instead of crashing", async () => {
         await expect(verify("abc")).rejects.toMatchObject({ status: 400 });
     });

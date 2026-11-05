@@ -20,6 +20,9 @@ services:
       # No free Redis needed: cache, queue and socket adapter degrade gracefully
       - key: DISABLE_REDIS
         value: "true"
+      # true = demo payments, no real money. Never set on a real store
+      - key: PAYMENT_SANDBOX
+        value: "true"
       # Set these in the dashboard (sync: false = never stored in git)
       - key: MONGO_URI
         sync: false

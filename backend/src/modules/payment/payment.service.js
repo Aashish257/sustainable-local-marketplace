@@ -78,8 +78,9 @@ export const verifyPaymentService = async ({
     userId, // passed by the controller; scripts/tests may omit it
 }) => {
     const keySecret = process.env.RAZORPAY_KEY_SECRET || "dummy_secret";
-    // Mock payments are only allowed outside production
-    const allowMock = process.env.NODE_ENV !== "production";
+    // Mock payments are allowed outside production, or in production only when the
+    // public demo explicitly opts in (PAYMENT_SANDBOX=true: no real money, never on a real store)
+    const allowMock = process.env.NODE_ENV !== "production" || process.env.PAYMENT_SANDBOX === "true";
     const isMock = allowMock && (
         razorpay_order_id?.startsWith("order_test_") ||
         razorpay_signature === "test_mode_signature" ||

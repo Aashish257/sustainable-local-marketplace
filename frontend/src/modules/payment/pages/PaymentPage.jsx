@@ -4,6 +4,10 @@ import { useCreatePayment, useVerifyPayment } from '../services/paymentQueries';
 import { useCartStore } from '../../cart/store/cartStore';
 import toast from 'react-hot-toast';
 
+// No key, or a Razorpay test key (rzp_test_...), means no real money can move
+const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID || '';
+const IS_DEMO_PAYMENT = !RAZORPAY_KEY || RAZORPAY_KEY.startsWith('rzp_test_');
+
 const StepIndicator = ({ step }) => {
     const steps = ['01 Delivery Details', '02 Payment Authorization', '03 Confirmation'];
     return (
@@ -154,6 +158,12 @@ const PaymentPage = () => {
                 </div>
 
                 <div className="glass-card p-6 space-y-6">
+                    {IS_DEMO_PAYMENT && (
+                        <p role="note" className="p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-sm text-[var(--text-main)]">
+                            <strong>Demo payment: no real money is charged.</strong> This portfolio demo uses Razorpay test mode.
+                        </p>
+                    )}
+
                     {/* Shield Icon */}
                     <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
                         <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white flex-shrink-0">
