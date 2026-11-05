@@ -92,7 +92,7 @@ describe("FR-8 Admin", () => {
         const buyer = await makeUser("buyer");
         const seller = await makeUser("seller");
         const p = await makeProduct(seller.user._id);
-        const o = await Order.create({ buyerId: buyer.user._id, status: "paid", items: [{ productId: p._id, quantity: 1, price: 100 }], totalAmount: 100 });
+        const o = await Order.create({ buyerId: buyer.user._id, status: "shipped", items: [{ productId: p._id, quantity: 1, price: 100 }], totalAmount: 100 });
         expect((await request(app).patch(`/api/admin/orders/${o._id}/status`).set(admin.auth).send({ status: "delivered" })).status).toBe(200);
         expect((await request(app).delete(`/api/admin/products/${p._id}`).set(admin.auth)).status).toBe(200);
         expect((await request(app).delete(`/api/admin/products/${p._id}`).set(admin.auth)).status).toBe(404);

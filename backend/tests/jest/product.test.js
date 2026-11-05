@@ -133,3 +133,30 @@ describe("FR-2.6 Marketplace vs Auctions sections", () => {
         expect(titles(await request(app).get("/api/products?type=auction&auction=live&search=later"))).toEqual(["Live Later"]);
     });
 });
+
+describe("FR-4.1 Creating an auction needs an end time", () => {
+    const auction = { title: "Old Radio", description: "restored 1970s valve radio", price: 900, category: "test", stock: 1, sustainabilityScore: 6, biddingEnabled: true };
+
+    it("rejects an auction without an end time, with a readable message", async () => {
+        const { auth } = await makeUser("seller");
+        const res = await request(app).post("/api/products").set(auth).send(auction);
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe("Auctions need an end time between now and 30 days from now");
+    });
+
+    it("rejects an end time in the past or more than 30 days away", async () => {
+        const { auth } = await makeUser("seller");
+        for (const days of [-1, 31]) {
+            const biddingEndTime = new Date(Date.now() + days * 86_400_000).toISOString();
+            expect((await request(app).post("/api/products").set(auth).send({ ...auction, biddingEndTime })).status).toBe(400);
+        }
+    });
+
+    it("accepts an auction ending in 3 days", async () => {
+        const { auth } = await makeUser("seller");
+        const biddingEndTime = new Date(Date.now() + 3 * 86_400_000).toISOString();
+        const res = await request(app).post("/api/products").set(auth).send({ ...auction, biddingEndTime });
+        expect(res.status).toBe(201);
+        expect(new Date(res.body.data.biddingEndTime).toISOString()).toBe(biddingEndTime);
+    });
+});
