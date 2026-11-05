@@ -19,12 +19,20 @@ const orderSchema = new mongoose.Schema(
 
         status: {
             type: String,
-            enum: ["pending", "paid", "shipped"],
+            enum: ["pending", "paid", "shipped", "delivered", "cancelled"],
             default: "pending",
         },
+        refundStatus: {
+            type: String,
+            enum: ["none", "requested", "processed", "failed"],
+            default: "none",
+        },
+
 
         paymentId: String,
         razorpayOrderId: String,
+        // "auction" orders are created for the auction winner at the winning price
+        source: { type: String, enum: ["cart", "auction"], default: "cart" },
     },
     { timestamps: true }
 );

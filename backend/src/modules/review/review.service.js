@@ -8,7 +8,7 @@ export const createReview = async (userId, productId, reviewData) => {
     // 1. PURCHASE VERIFICATION
     const hasPurchased = await Order.findOne({
         buyerId: userId,
-        status: "paid",
+        status: { $in: ["paid", "shipped", "delivered"] },
         "items.productId": productId
     });
 

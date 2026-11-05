@@ -38,7 +38,12 @@ async function runTest() {
         
         const initialStock = 10;
         const buyQuantity = 2;
-        const product = await createProductService({ title: "Eco Bag", price: 100, stock: initialStock }, { id: seller.id, role: "seller" });
+        const product = await createProductService({ 
+            title: "Eco Bag", 
+            description: "Beautiful sustainable bag for shopping",
+            price: 100, 
+            stock: initialStock 
+        }, { id: seller.id, role: "seller" });
         console.log("Product Created:", product.title, "Stock:", product.stock);
 
         // 3. Add to Cart

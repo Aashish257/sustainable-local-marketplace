@@ -14,12 +14,22 @@ import cartRoutes from "./modules/cart/cart.routes.js";
 import orderRoutes from "./modules/order/order.routes.js";
 import paymentRoutes from "./modules/payment/payment.routes.js";
 import reviewRoutes from "./modules/review/review.routes.js";
+import messageRoutes from "./modules/message/message.routes.js";
+import bidRoutes from "./modules/bid/bid.routes.js";
+import adminRoutes from "./modules/admin/admin.routes.js";
+import notificationRoutes from "./modules/notification/notification.routes.js";
+import uploadRoutes from "./modules/upload/upload.routes.js";
 
 const app = express();
+// Behind Render/Cloudflare: read the real client IP from X-Forwarded-For (1 proxy hop)
+app.set("trust proxy", 1);
+
 
 // 1. SECURITY HARDENING (Requirement 4)
 app.use(helmet()); // Secure HTTP headers
-app.use(cors({ origin: process.env.CLIENT_URL || "*" })); // Strict CORS (Change from * in prod)
+// CORS: CLIENT_URL may be a comma-separated list. In prod without it, block cross-origin calls instead of allowing "*"
+const allowedOrigins = process.env.CLIENT_URL?.split(",").map((o) => o.trim());
+app.use(cors({ origin: allowedOrigins || (process.env.NODE_ENV === "production" ? false : "*") }));
 app.use(express.json());
 
 // 2. LOGGING (Requirement 7)
@@ -34,13 +44,14 @@ const globalLimiter = rateLimit({
 });
 app.use("/api", globalLimiter);
 
-// Specific stricter limit for login (Requirement 4)
+// Auth rate limit: strict in production, lenient in development
 const authLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 5, // Limit login to 5 attempts per window
-    message: { success: false, error: "Too many login attempts. Try again in an hour." }
+    windowMs: process.env.NODE_ENV === "production" ? 60 * 60 * 1000 : 15 * 60 * 1000,
+    max: process.env.NODE_ENV === "production" ? 5 : 50,
+    message: { success: false, error: "Too many login attempts. Please try again later." }
 });
 app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 
 // 4. API ROUTES
 app.get("/", (req, res) => {
@@ -53,6 +64,11 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/messages", messageRoutes);
+app.use("/api/bids", bidRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.use(errorHandler);
 

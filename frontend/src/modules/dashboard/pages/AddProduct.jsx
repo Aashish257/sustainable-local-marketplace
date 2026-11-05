@@ -1,0 +1,290 @@
+import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import apiClient from '../../../services/apiClient';
+import ImageUploader from '../../../shared/components/ImageUploader';
+
+const CATEGORIES = [
+    'Zero Waste',
+    'Organic Food',
+    'Eco Apparel',
+    'Handmade Goods',
+    'Home & Garden',
+    'Refurbished Tech',
+    'Upcycled Goods',
+    'Renewable Energy'
+];
+
+const AddProduct = () => {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        price: '',
+        category: 'Zero Waste',
+        stock: '10',
+        imageUrl: '',
+        sustainabilityScore: 8,
+        biddingEnabled: false,
+        biddingStartingPrice: '',
+        biddingEndTime: '', // datetime-local value, e.g. "2026-11-01T18:00"
+    });
+
+    const mutation = useMutation({
+        mutationFn: (newProduct) => apiClient.post('/products', newProduct),
+        onSuccess: () => {
+            toast.success('Product submitted! It will appear in the catalog after admin approval.');
+            queryClient.invalidateQueries({ queryKey: ['my-products'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            navigate('/dashboard/products');
+        },
+        onError: (err) => {
+            toast.error(err.response?.data?.error || 'Failed to create product listing');
+        }
+    });
+
+    // Allowed range for the auction end picker (local time, minute precision)
+    // Computed once when the form opens (lazy state keeps render pure)
+    const [{ minEnd, maxEnd }] = useState(() => {
+        const toLocalInput = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        const now = Date.now();
+        return {
+            minEnd: toLocalInput(new Date(now + 60 * 60 * 1000)),
+            maxEnd: toLocalInput(new Date(now + 30 * 24 * 60 * 60 * 1000)),
+        };
+    });
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        const payload = {
+            title: formData.title,
+            description: formData.description,
+            price: Number(formData.price),
+            category: formData.category,
+            stock: Number(formData.stock),
+            images: formData.imageUrl ? [formData.imageUrl] : [],
+            sustainabilityScore: Number(formData.sustainabilityScore),
+            biddingEnabled: Boolean(formData.biddingEnabled),
+            biddingStartingPrice: formData.biddingEnabled ? Number(formData.biddingStartingPrice || formData.price) : undefined,
+            // datetime-local is local time; toISOString sends an unambiguous UTC time
+            biddingEndTime: formData.biddingEnabled && formData.biddingEndTime ? new Date(formData.biddingEndTime).toISOString() : undefined,
+        };
+
+        mutation.mutate(payload);
+    };
+
+    return (
+        <div className="max-w-3xl mx-auto animate-fade-in-up space-y-6">
+            <div>
+                <div className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-mono text-xs uppercase tracking-wider mb-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    INVENTORY CREATION
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-black font-display text-[var(--text-main)]">Add New Product</h1>
+                <p className="text-xs text-[var(--text-muted)] mt-1 font-sans">
+                    Publish an audited sustainable listing with ecological scoring and optional live bidding.
+                </p>
+            </div>
+
+            <div className="glass-card overflow-hidden shadow-xl">
+                <form onSubmit={handleSubmit} className="p-7 space-y-6">
+                    {/* Basic Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="col-span-2">
+                            <label className="block text-xs font-semibold text-[var(--text-main)] uppercase tracking-wider mb-1.5 font-mono">Product Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                required
+                                minLength={3}
+                                value={formData.title}
+                                onChange={handleChange}
+                                placeholder="e.g. Handcrafted Reclaimed Bamboo Cutlery Set"
+                                className="w-full px-4 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-[var(--text-main)] text-xs focus:outline-none focus:border-emerald-500 transition-colors"
+                            />
+                        </div>
+
+                        <div className="col-span-2">
+                            <label className="block text-xs font-semibold text-[var(--text-main)] uppercase tracking-wider mb-1.5 font-mono">Description &amp; Eco Materials</label>
+                            <textarea
+                                name="description"
+                                required
+                                minLength={10}
+                                rows={3}
+                                value={formData.description}
+                                onChange={handleChange}
+                                placeholder="Detail the materials used, plastic-free crafting process, and zero-waste disposal instructions..."
+                                className="w-full px-4 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-[var(--text-main)] font-sans text-xs focus:outline-none focus:border-emerald-500 transition-colors resize-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-[var(--text-main)] uppercase tracking-wider mb-1.5 font-mono">Retail Price (₹)</label>
+                            <input
+                                type="number"
+                                name="price"
+                                required
+                                min={1}
+                                step="any"
+                                value={formData.price}
+                                onChange={handleChange}
+                                placeholder="499"
+                                className="w-full px-4 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-[var(--text-main)] font-mono text-xs focus:outline-none focus:border-emerald-500 transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-[var(--text-main)] uppercase tracking-wider mb-1.5 font-mono">Available Stock Units</label>
+                            <input
+                                type="number"
+                                name="stock"
+                                required
+                                min={0}
+                                value={formData.stock}
+                                onChange={handleChange}
+                                placeholder="25"
+                                className="w-full px-4 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-[var(--text-main)] font-mono text-xs focus:outline-none focus:border-emerald-500 transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-[var(--text-main)] uppercase tracking-wider mb-1.5 font-mono">Category</label>
+                            <select
+                                name="category"
+                                value={formData.category}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-[var(--text-main)] text-xs focus:outline-none focus:border-emerald-500 transition-colors cursor-pointer"
+                            >
+                                {CATEGORIES.map(cat => (
+                                    <option key={cat} value={cat} className="bg-[var(--bg-card)] text-[var(--text-main)]">{cat}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-semibold text-[var(--text-main)] uppercase tracking-wider mb-1.5 font-mono">
+                                Sustainability Rating: {formData.sustainabilityScore}/10
+                            </label>
+                            <input
+                                type="range"
+                                name="sustainabilityScore"
+                                required
+                                min={1}
+                                max={10}
+                                step="1"
+                                value={formData.sustainabilityScore}
+                                onChange={handleChange}
+                                className="w-full h-2 bg-[var(--border-card)] rounded-lg appearance-none cursor-pointer accent-emerald-500 mt-2"
+                            />
+                            <div className="flex justify-between text-xs font-mono text-[var(--text-muted)] mt-1">
+                                <span>1 (Basic)</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-bold">{formData.sustainabilityScore >= 8 ? 'Exemplary' : 'Moderate'}</span>
+                                <span>10 (Fully circular)</span>
+                            </div>
+                        </div>
+
+                        <div className="col-span-2">
+                            <label className="block text-xs font-semibold text-[var(--text-main)] uppercase tracking-wider mb-1.5 font-mono">Product Image URL</label>
+                            <input
+                                type="url"
+                                name="imageUrl"
+                                value={formData.imageUrl}
+                                onChange={handleChange}
+                                placeholder="https://images.unsplash.com/photo-..."
+                                className="w-full px-4 py-2.5 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-xl text-[var(--text-main)] text-xs focus:outline-none focus:border-emerald-500 transition-colors"
+                            />
+                            <ImageUploader onUploaded={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))} />
+                            {formData.imageUrl && (
+                                <div className="mt-3 flex items-center gap-3">
+                                    <div className="w-14 h-14 rounded-xl overflow-hidden border border-[var(--border-card)] bg-[var(--bg-page)] flex-shrink-0">
+                                        <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+                                    </div>
+                                    <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-bold">Preview Verified</span>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Live Auction Toggle */}
+                        <div className="col-span-2 glass-card p-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h4 className="text-xs font-bold text-[var(--text-main)] font-display uppercase flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                                        Enable Real-Time Bidding Auction
+                                    </h4>
+                                    <p className="text-xs text-[var(--text-muted)] font-sans mt-0.5">Allows conscious buyers to place live bids with countdown clock</p>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    name="biddingEnabled"
+                                    checked={formData.biddingEnabled}
+                                    onChange={handleChange}
+                                    className="w-4 h-4 rounded accent-emerald-500 cursor-pointer"
+                                />
+                            </div>
+
+                            {formData.biddingEnabled && (
+                                <div className="mt-3 pt-3 border-t border-[var(--border-card)]">
+                                    <label className="block text-xs font-mono font-bold text-[var(--text-main)] uppercase mb-1">Starting Floor Bid (₹)</label>
+                                    <input
+                                        type="number"
+                                        name="biddingStartingPrice"
+                                        value={formData.biddingStartingPrice}
+                                        onChange={handleChange}
+                                        placeholder={formData.price ? `Starting at ₹${formData.price}` : 'Enter starting price'}
+                                        className="w-full px-3 py-2 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-lg text-[var(--text-main)] font-mono text-xs focus:outline-none focus:border-emerald-500"
+                                    />
+                                    <label htmlFor="biddingEndTime" className="block text-xs font-semibold text-[var(--text-main)] mt-3 mb-1">Auction ends</label>
+                                    <input
+                                        id="biddingEndTime"
+                                        type="datetime-local"
+                                        name="biddingEndTime"
+                                        required
+                                        min={minEnd}
+                                        max={maxEnd}
+                                        value={formData.biddingEndTime}
+                                        onChange={handleChange}
+                                        className="w-full px-3 py-2 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-lg text-[var(--text-main)] text-xs focus:outline-none focus:border-emerald-500"
+                                    />
+                                    <p className="text-xs text-[var(--text-muted)] mt-1">Up to 30 days from now. The highest bidder wins when time runs out.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-[var(--border-card)] flex justify-end gap-3 text-xs">
+                        <button
+                            type="button"
+                            onClick={() => navigate('/dashboard/products')}
+                            className="btn-secondary px-4 py-2 font-semibold"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={mutation.isPending}
+                            className="btn-primary px-6 py-2 uppercase font-semibold disabled:opacity-50 cursor-pointer"
+                        >
+                            {mutation.isPending ? 'Publishing…' : 'Publish Product →'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default AddProduct;
+

@@ -50,7 +50,12 @@ async function runTests() {
     const userA = await User.create({ name: "User A", email: "a@test.com", password: "password", role: "buyer" });
     const userB = await User.create({ name: "User B", email: "b@test.com", password: "password", role: "buyer" });
     const seller = await User.create({ name: "Seller", email: "s@test.com", password: "password", role: "seller" });
-    const product = await Product.create({ title: "Art Piece", price: 100, sellerId: seller._id });
+    const product = await Product.create({ 
+        title: "Art Piece", 
+        description: "Beautiful art piece of high quality", 
+        price: 100, 
+        sellerId: seller._id 
+    });
 
     const tokenA = generateToken({ id: userA._id, role: userA.role });
     const tokenB = generateToken({ id: userB._id, role: userB.role });

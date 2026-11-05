@@ -1,6 +1,6 @@
 import express from "express";
 import * as productController from "./product.controller.js";
-import { protect, authorize } from "../../middleware/auth.middleware.js";
+import { protect, authorize, optionalAuth } from "../../middleware/auth.middleware.js";
 import { cacheMiddleware } from "../../middleware/cache.middleware.js";
 
 const router = express.Router();
@@ -12,7 +12,8 @@ const router = express.Router();
 
 // Public routes
 router.get("/", cacheMiddleware(60), productController.getProducts);
-router.get("/:id", productController.getProductById);
+router.get("/mine", protect, authorize("seller"), productController.getMyProducts);
+router.get("/:id", optionalAuth, productController.getProductById);
 
 
 // Protected routes - Seller only (Requirement 7)

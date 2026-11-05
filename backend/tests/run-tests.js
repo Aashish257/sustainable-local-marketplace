@@ -85,6 +85,7 @@ async function runTests() {
             name: "Aashish",
             email: "test@test.com",
             password: "123456",
+            consent: true,
         });
         log("TEST 1 — Register: Valid Input", status, data, 201);
     }
@@ -104,6 +105,7 @@ async function runTests() {
             name: "Aashish",
             email: "test@test.com",
             password: "123456",
+            consent: true,
         });
         log("EDGE 1 — Register: Duplicate Email", status, data, 400);
     }
@@ -123,6 +125,7 @@ async function runTests() {
             name: "Aashish",
             email: "not-an-email",
             password: "123456",
+            consent: true,
         });
         log("EDGE 3 — Register: Invalid Email Format", status, data, 400);
     }

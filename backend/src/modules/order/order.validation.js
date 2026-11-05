@@ -13,4 +13,11 @@ export const verifyPaymentSchema = z.object({
     razorpay_order_id: z.string().min(1, "Razorpay Order ID is required"),
     razorpay_payment_id: z.string().min(1, "Razorpay Payment ID is required"),
     razorpay_signature: z.string().min(1, "Razorpay Signature is required"),
+    orderId: z.string().optional(),
+});
+
+export const updateOrderStatusSchema = z.object({
+    status: z.enum(["pending", "paid", "shipped", "delivered", "cancelled"], {
+        error: "Status must be pending, paid, shipped, delivered, or cancelled"
+    }),
 });

@@ -5,7 +5,7 @@ import {
     updateProductService,
     deleteProductService,
 } from "./product.service.js";
-import { createProductSchema } from "./product.validation.js";
+import { createProductSchema, updateProductSchema } from "./product.validation.js";
 
 export const createProduct = async (req, res, next) => {
     try {
@@ -21,9 +21,13 @@ export const createProduct = async (req, res, next) => {
 
 export const getProducts = async (req, res, next) => {
     try {
-        const products = await getProductsService(req.query);
+        const result = await getProductsService(req.query);
 
-        res.json({ success: true, data: products });
+        res.json({
+            success: true,
+            data: result.products,
+            pagination: result.pagination
+        });
     } catch (err) {
         next(err);
     }
@@ -31,7 +35,7 @@ export const getProducts = async (req, res, next) => {
 
 export const getProductById = async (req, res, next) => {
     try {
-        const product = await getProductByIdService(req.params.id);
+        const product = await getProductByIdService(req.params.id, req.user);
         res.json({ success: true, data: product });
     } catch (err) {
         next(err);
@@ -42,7 +46,7 @@ export const updateProduct = async (req, res, next) => {
     try {
         const product = await updateProductService(
             req.params.id,
-            req.body,
+            updateProductSchema.parse(req.body), // strips unknown fields (e.g. isApproved, currentBid)
             req.user
         );
 
@@ -57,6 +61,17 @@ export const deleteProduct = async (req, res, next) => {
         await deleteProductService(req.params.id, req.user);
 
         res.json({ success: true });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// GET /api/products/mine — Seller dashboard: get own products
+export const getMyProducts = async (req, res, next) => {
+    try {
+        const { Product } = await import("../../models/product.model.js");
+        const products = await Product.find({ sellerId: req.user.id }).sort({ createdAt: -1 });
+        res.json({ success: true, data: products });
     } catch (err) {
         next(err);
     }

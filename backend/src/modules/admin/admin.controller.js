@@ -1,0 +1,186 @@
+import User from "../../models/user.model.js";
+import { Product } from "../../models/product.model.js";
+import { Order } from "../../models/order.model.js";
+import { applyStatusChange } from "../order/order.service.js";
+import { invalidateCache } from "../../middleware/cache.middleware.js";
+import { notifyUser } from "../notification/notification.service.js";
+
+export const getSystemStats = async (req, res, next) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        const totalProducts = await Product.countDocuments();
+        const totalOrders = await Order.countDocuments();
+
+        // Calculate total platform revenue
+        const orders = await Order.find({ status: { $ne: 'cancelled' } });
+        const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+
+        res.json({
+            success: true,
+            data: {
+                totalUsers,
+                totalProducts,
+                totalOrders,
+                totalRevenue
+            }
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getAllUsers = async (req, res, next) => {
+    try {
+        const users = await User.find().select('-password').sort({ createdAt: -1 });
+        res.json({ success: true, data: users });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getAllProducts = async (req, res, next) => {
+    try {
+        // ?status=pending | approved narrows the moderation queue
+        const filter = {};
+        if (req.query.status === "pending") filter.isApproved = false;
+        if (req.query.status === "approved") filter.isApproved = true;
+        const products = await Product.find(filter).populate('sellerId', 'name email').sort({ createdAt: -1 });
+        res.json({ success: true, data: products });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getAllOrders = async (req, res, next) => {
+    try {
+        const orders = await Order.find()
+            .populate('buyerId', 'name email')
+            .sort({ createdAt: -1 });
+        res.json({ success: true, data: orders });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// PATCH /api/admin/users/:id/role
+export const updateUserRole = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { role } = req.body;
+
+        if (!["buyer", "seller", "admin"].includes(role)) {
+            return res.status(400).json({ success: false, error: "Invalid role specified" });
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ success: false, error: "User not found" });
+        }
+
+        // Prevent self-demotion
+        if (user._id.toString() === req.user.id && role !== "admin") {
+            return res.status(400).json({ success: false, error: "Administrators cannot self-demote" });
+        }
+
+        user.role = role;
+        await user.save();
+
+        res.json({ success: true, data: { id: user._id, role: user.role } });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// DELETE /api/admin/users/:id
+// PATCH /api/admin/users/:id/status  body: { active: boolean }
+export const setUserStatus = async (req, res, next) => {
+    try {
+        const { active } = req.body;
+        if (typeof active !== "boolean") {
+            return res.status(400).json({ success: false, error: "active must be true or false" });
+        }
+        if (req.params.id === req.user.id) {
+            return res.status(400).json({ success: false, error: "Administrators cannot suspend themselves" });
+        }
+        // Suspending also bumps tokenVersion so the user is kicked out immediately
+        const update = active ? { isActive: true } : { isActive: false, $inc: { tokenVersion: 1 } };
+        const user = await User.findByIdAndUpdate(req.params.id, update, { new: true }).select("-password");
+        if (!user) {
+            return res.status(404).json({ success: false, error: "User not found" });
+        }
+        res.json({ success: true, data: user });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const deleteUser = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        if (id === req.user.id) {
+            return res.status(400).json({ success: false, error: "Administrators cannot delete themselves" });
+        }
+
+        const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            return res.status(404).json({ success: false, error: "User not found" });
+        }
+
+        res.json({ success: true, message: "User deleted successfully" });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// DELETE /api/admin/products/:id
+// PATCH /api/admin/products/:id/approval  body: { approved: boolean }
+export const setProductApproval = async (req, res, next) => {
+    try {
+        const { approved } = req.body;
+        if (typeof approved !== "boolean") {
+            return res.status(400).json({ success: false, error: "approved must be true or false" });
+        }
+        const product = await Product.findByIdAndUpdate(req.params.id, { isApproved: approved }, { new: true });
+        if (!product) {
+            return res.status(404).json({ success: false, error: "Product not found" });
+        }
+        await invalidateCache("cache:/api/products*"); // catalog list must reflect the change
+        res.json({ success: true, data: product });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const deleteProductAdmin = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndDelete(id);
+        if (!product) {
+            return res.status(404).json({ success: false, error: "Product not found" });
+        }
+
+        res.json({ success: true, message: "Product deleted successfully" });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// PATCH /api/admin/orders/:id/status
+export const updateOrderStatusAdmin = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const order = await Order.findById(id);
+        if (!order) {
+            return res.status(404).json({ success: false, error: "Order not found" });
+        }
+
+        await applyStatusChange(order, status);
+        await notifyUser(order.buyerId, { type: "order", message: `Your order #${order._id.toString().slice(-6)} is now ${status}.`, link: `/orders/${order._id}` });
+
+        res.json({ success: true, data: order });
+    } catch (err) {
+        next(err);
+    }
+};

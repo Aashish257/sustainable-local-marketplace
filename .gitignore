@@ -132,3 +132,13 @@ dist
 # Ignore generated audit reports
 audit Report/
 
+# Local agents skills folder
+.agents/skills/
+.agents/
+.arena/
+
+
+# Local tooling output
+.superpowers/
+graphify-out/
+frontend/dist-e2e/

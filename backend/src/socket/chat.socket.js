@@ -1,6 +1,7 @@
 import { Message } from "../models/message.model.js";
 import User from "../models/user.model.js";
 import { addNotification } from "../config/queue.js";
+import { notifyUser } from "../modules/notification/notification.service.js";
 
 export default (io, socket) => {
     // 1. JOIN OWN ROOM (Requirement 3)
@@ -35,6 +36,13 @@ export default (io, socket) => {
             // Note: We also emit to the sender's room so their other devices (if any) stay in sync.
             io.to(receiverId).emit("receive_message", newMessage);
             socket.emit("message_sent", newMessage); // Acknowledge to sender
+
+            // Real-time notification to receiver
+            notifyUser(receiverId, {
+                type: "chat",
+                message: `💬 New message from ${socket.user.name || "someone"}`,
+                link: "/messages"
+            });
 
             // 1. Queue Background Job for Notification (Requirement 3)
             await addNotification("chat_alert", {

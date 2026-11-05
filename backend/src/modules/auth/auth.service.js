@@ -12,9 +12,14 @@ export const registerService = async (data) => {
 
     const hashed = await hashPassword(data.password);
 
+    // Pick fields explicitly so clients cannot set extra fields on the user
     const user = await createUser({
-        ...data,
+        name: data.name,
+        email: data.email,
+        role: data.role,
         password: hashed,
+        consentGiven: true,
+        consentAt: new Date(),
     });
 
     return { id: user._id };
@@ -26,11 +31,21 @@ export const loginService = async ({ email, password }) => {
 
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) throw new AppError("Invalid credentials", 400);
+    if (user.isActive === false) throw new AppError("This account has been suspended", 403);
 
     const token = generateToken({
         id: user._id,
         role: user.role,
+        tv: user.tokenVersion || 0, // token version: logout invalidates older tokens
     });
 
-    return { token };
-};
+    return { 
+        token, 
+        user: { 
+            id: user._id, 
+            name: user.name, 
+            email: user.email, 
+            role: user.role 
+        } 
+    };
+};
