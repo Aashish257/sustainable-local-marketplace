@@ -1,0 +1,37 @@
+# Render Blueprint: New > Blueprint > pick this repo. Free web service for the API.
+services:
+  - type: web
+    name: sustainable-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: BCRYPT_ROUNDS
+        value: "12"
+      # No free Redis needed: cache, queue and socket adapter degrade gracefully
+      - key: DISABLE_REDIS
+        value: "true"
+      # Set these in the dashboard (sync: false = never stored in git)
+      - key: MONGO_URI
+        sync: false
+      - key: CLIENT_URL
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false

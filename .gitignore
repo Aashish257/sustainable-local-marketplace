@@ -132,3 +132,8 @@ dist
 # Ignore generated audit reports
 audit Report/
 
+# Local agents skills folder
+.agents/skills/
+.agents/
+.arena/
+
