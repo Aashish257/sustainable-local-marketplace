@@ -3,13 +3,19 @@ import razorpay from "../../config/razorpay.js";
 import { findOrderById, findOrderByRazorpayId, updateOrder as updateOrderRepo } from "../order/order.repository.js";
 import { updateProduct as updateProductRepo, decrementStockIfAvailable } from "../product/product.repository.js";
 import { AppError } from "../../utils/AppError.js";
+import { Order } from "../../models/order.model.js";
 import { notifyUser } from "../notification/notification.service.js";
 
 const isTestKey = (key) => !key || key === "rzp_test_dummy" || key.includes("dummy");
 
-export const createRazorpayOrderService = async (orderId) => {
+export const createRazorpayOrderService = async (orderId, userId) => {
     const order = await findOrderById(orderId);
-    if (!order) throw new Error("Order not found");
+    if (!order) throw new AppError("Order not found", 404);
+    // Only the buyer can pay for their own, still-unpaid order
+    if (userId && (order.buyerId?._id || order.buyerId)?.toString() !== userId.toString()) {
+        throw new AppError("Not your order", 403);
+    }
+    if (order.status !== "pending") throw new AppError(`Order already ${order.status}`, 409);
 
     const amountInPaisa = Math.round(order.totalAmount * 100);
 
@@ -69,6 +75,7 @@ export const verifyPaymentService = async ({
     razorpay_payment_id,
     razorpay_signature,
     orderId,
+    userId, // passed by the controller; scripts/tests may omit it
 }) => {
     const keySecret = process.env.RAZORPAY_KEY_SECRET || "dummy_secret";
     // Mock payments are only allowed outside production
@@ -101,12 +108,21 @@ export const verifyPaymentService = async ({
 
     if (!order) throw new Error("Order not found for this payment");
 
-    // Idempotency: never process a paid/cancelled order twice
-    if (order.status !== "pending") {
-        throw new AppError(`Order already ${order.status}`, 409);
+    if (userId && (order.buyerId?._id || order.buyerId)?.toString() !== userId.toString()) {
+        throw new AppError("Not your order", 403);
     }
 
     const paymentId = razorpay_payment_id || `pay_test_${Date.now()}`;
+
+    // Idempotency + race safety: atomically claim the order. If two verify calls
+    // arrive together, only the first one gets past this line.
+    const claimed = await Order.findOneAndUpdate(
+        { _id: order._id, status: "pending", paymentId: null },
+        { $set: { paymentId } }
+    );
+    if (!claimed) {
+        throw new AppError(order.status === "pending" ? "Payment is already being processed" : `Order already ${order.status}`, 409);
+    }
 
     // Reserve stock atomically BEFORE marking the order paid
     const reserved = [];

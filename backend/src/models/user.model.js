@@ -22,6 +22,11 @@ const userSchema = new mongoose.Schema(
         // Privacy consent captured at signup (DPDP / GDPR style audit trail)
         consentGiven: { type: Boolean, default: false },
         consentAt: { type: Date },
+
+        // Suspended accounts cannot log in or use existing tokens
+        isActive: { type: Boolean, default: true },
+        // Bumped on logout/suspension: every token issued before that stops working
+        tokenVersion: { type: Number, default: 0 },
     },
     { timestamps: true }
 );

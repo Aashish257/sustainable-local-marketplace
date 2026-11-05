@@ -1,20 +1,29 @@
 import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError.js";
+import User from "../models/user.model.js";
 
-export const protect = (req, res, next) => {
+// Verifies the JWT AND checks the account in the DB, so logout, suspension and
+// role changes take effect immediately (a pure JWT check would trust the token for 7 days).
+export const verifyAccessToken = async (token) => {
+    if (!token) throw new AppError("Unauthorized", 401);
+    let decoded;
     try {
-        const token = req.headers.authorization?.split(" ")[1];
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+        throw new AppError("Unauthorized", 401);
+    }
+    const user = await User.findById(decoded.id).select("name role isActive tokenVersion").lean();
+    if (!user || user.isActive === false) throw new AppError("Unauthorized", 401);
+    if ((decoded.tv ?? 0) !== (user.tokenVersion ?? 0)) throw new AppError("Session expired, please log in again", 401);
+    return { id: user._id.toString(), role: user.role, name: user.name };
+};
 
-        if (!token) throw new Error("Unauthorized");
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        req.user = decoded;
-
+export const protect = async (req, res, next) => {
+    try {
+        req.user = await verifyAccessToken(req.headers.authorization?.split(" ")[1]);
         next();
     } catch (err) {
-        // 401 so clients can tell "log in again" apart from a server error
-        next(new AppError("Unauthorized", 401));
+        next(err.status ? err : new AppError("Unauthorized", 401));
     }
 };
 

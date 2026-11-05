@@ -31,6 +31,8 @@ const orderSchema = new mongoose.Schema(
 
         paymentId: String,
         razorpayOrderId: String,
+        // "auction" orders are created for the auction winner at the winning price
+        source: { type: String, enum: ["cart", "auction"], default: "cart" },
     },
     { timestamps: true }
 );

@@ -7,6 +7,7 @@ import {
     getAllOrders,
     updateUserRole,
     deleteUser,
+    setUserStatus,
     deleteProductAdmin,
     setProductApproval,
     updateOrderStatusAdmin
@@ -25,6 +26,7 @@ router.get("/orders", getAllOrders);
 
 router.patch("/users/:id/role", updateUserRole);
 router.delete("/users/:id", deleteUser);
+router.patch("/users/:id/status", setUserStatus);
 router.delete("/products/:id", deleteProductAdmin);
 router.patch("/products/:id/approval", setProductApproval);
 router.patch("/orders/:id/status", updateOrderStatusAdmin);

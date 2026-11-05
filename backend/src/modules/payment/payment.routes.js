@@ -7,6 +7,7 @@ import { createPaymentSchema, verifyPaymentSchema } from "../order/order.validat
 const router = express.Router();
 
 router.post("/create", protect, validate(createPaymentSchema), createPaymentOrder);
+router.post("/create-order", protect, validate(createPaymentSchema), createPaymentOrder);
 router.post("/verify", protect, validate(verifyPaymentSchema), verifyPayment);
 
 export default router;

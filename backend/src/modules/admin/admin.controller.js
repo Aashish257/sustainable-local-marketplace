@@ -1,6 +1,7 @@
 import User from "../../models/user.model.js";
 import { Product } from "../../models/product.model.js";
 import { Order } from "../../models/order.model.js";
+import { applyStatusChange } from "../order/order.service.js";
 import { invalidateCache } from "../../middleware/cache.middleware.js";
 import { notifyUser } from "../notification/notification.service.js";
 
@@ -91,6 +92,28 @@ export const updateUserRole = async (req, res, next) => {
 };
 
 // DELETE /api/admin/users/:id
+// PATCH /api/admin/users/:id/status  body: { active: boolean }
+export const setUserStatus = async (req, res, next) => {
+    try {
+        const { active } = req.body;
+        if (typeof active !== "boolean") {
+            return res.status(400).json({ success: false, error: "active must be true or false" });
+        }
+        if (req.params.id === req.user.id) {
+            return res.status(400).json({ success: false, error: "Administrators cannot suspend themselves" });
+        }
+        // Suspending also bumps tokenVersion so the user is kicked out immediately
+        const update = active ? { isActive: true } : { isActive: false, $inc: { tokenVersion: 1 } };
+        const user = await User.findByIdAndUpdate(req.params.id, update, { new: true }).select("-password");
+        if (!user) {
+            return res.status(404).json({ success: false, error: "User not found" });
+        }
+        res.json({ success: true, data: user });
+    } catch (err) {
+        next(err);
+    }
+};
+
 export const deleteUser = async (req, res, next) => {
     try {
         const { id } = req.params;
@@ -153,8 +176,7 @@ export const updateOrderStatusAdmin = async (req, res, next) => {
             return res.status(404).json({ success: false, error: "Order not found" });
         }
 
-        order.status = status;
-        await order.save();
+        await applyStatusChange(order, status);
         await notifyUser(order.buyerId, { type: "order", message: `Your order #${order._id.toString().slice(-6)} is now ${status}.`, link: `/orders/${order._id}` });
 
         res.json({ success: true, data: order });

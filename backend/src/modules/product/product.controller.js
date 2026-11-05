@@ -5,7 +5,7 @@ import {
     updateProductService,
     deleteProductService,
 } from "./product.service.js";
-import { createProductSchema } from "./product.validation.js";
+import { createProductSchema, updateProductSchema } from "./product.validation.js";
 
 export const createProduct = async (req, res, next) => {
     try {
@@ -46,7 +46,7 @@ export const updateProduct = async (req, res, next) => {
     try {
         const product = await updateProductService(
             req.params.id,
-            req.body,
+            updateProductSchema.parse(req.body), // strips unknown fields (e.g. isApproved, currentBid)
             req.user
         );
 

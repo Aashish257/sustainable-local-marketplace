@@ -31,10 +31,12 @@ export const loginService = async ({ email, password }) => {
 
     const isMatch = await comparePassword(password, user.password);
     if (!isMatch) throw new AppError("Invalid credentials", 400);
+    if (user.isActive === false) throw new AppError("This account has been suspended", 403);
 
     const token = generateToken({
         id: user._id,
         role: user.role,
+        tv: user.tokenVersion || 0, // token version: logout invalidates older tokens
     });
 
     return { 

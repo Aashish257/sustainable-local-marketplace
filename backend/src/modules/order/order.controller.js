@@ -1,4 +1,4 @@
-import { createOrderService } from "./order.service.js";
+import { createOrderService, applyStatusChange, createAuctionOrderService } from "./order.service.js";
 import { Order } from "../../models/order.model.js";
 import { notifyUser } from "../notification/notification.service.js";
 
@@ -108,11 +108,20 @@ export const updateOrderStatus = async (req, res, next) => {
             }
         }
 
-        order.status = status;
-        await order.save();
+        await applyStatusChange(order, status);
         await notifyUser(order.buyerId, { type: "order", message: `Your order #${order._id.toString().slice(-6)} is now ${status}.`, link: `/orders/${order._id}` });
 
         res.json({ success: true, data: order });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// POST /api/orders/auction/:productId — winner creates (or re-opens) their checkout order
+export const createAuctionOrder = async (req, res, next) => {
+    try {
+        const order = await createAuctionOrderService(req.user.id, req.params.productId);
+        res.status(201).json({ success: true, data: order });
     } catch (err) {
         next(err);
     }

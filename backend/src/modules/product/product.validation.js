@@ -11,7 +11,16 @@ export const createProductSchema = z.object({
     biddingEnabled: z.boolean().optional(),
     biddingStartingPrice: z.number().nonnegative().optional(),
     biddingEndTime: z.string().or(z.date()).optional()
-});
+}).refine(
+    // An auction needs an end time in the future (max 30 days), or it would never close
+    (d) => {
+        if (!d.biddingEnabled) return true;
+        const end = new Date(d.biddingEndTime).getTime();
+        const now = Date.now();
+        return Number.isFinite(end) && end > now && end <= now + 30 * 24 * 60 * 60 * 1000;
+    },
+    { message: "Auctions need an end time between now and 30 days from now", path: ["biddingEndTime"] }
+);
 
 export const updateProductSchema = z.object({
     title: z.string().min(3).optional(),

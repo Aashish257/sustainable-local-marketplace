@@ -18,6 +18,7 @@ import messageRoutes from "./modules/message/message.routes.js";
 import bidRoutes from "./modules/bid/bid.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
 import notificationRoutes from "./modules/notification/notification.routes.js";
+import uploadRoutes from "./modules/upload/upload.routes.js";
 
 const app = express();
 // Behind Render/Cloudflare: read the real client IP from X-Forwarded-For (1 proxy hop)
@@ -67,6 +68,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/bids", bidRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.use(errorHandler);
 
