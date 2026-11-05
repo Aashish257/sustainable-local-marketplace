@@ -32,7 +32,8 @@ export const login = async (req, res, next) => {
 // Bumping tokenVersion revokes every token this user holds (all devices)
 export const logout = async (req, res, next) => {
     try {
-        await User.updateOne({ _id: req.user.id }, { $inc: { tokenVersion: 1 } });
+        // Demo accounts are shared: revoking their tokens would sign out every visitor using them
+        if (!req.user.isDemo) await User.updateOne({ _id: req.user.id }, { $inc: { tokenVersion: 1 } });
         res.json({ success: true, message: "Logged out successfully" });
     } catch (err) {
         next(err);

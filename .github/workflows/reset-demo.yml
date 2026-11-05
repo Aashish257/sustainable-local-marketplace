@@ -1,0 +1,31 @@
+name: Reset public demo data
+
+# Every night, put the shared demo accounts and demo products back to their
+# starting state, undoing whatever visitors changed. Real accounts are untouched.
+# Needs the repository secret MONGO_URI (Settings > Secrets and variables > Actions).
+on:
+  schedule:
+    - cron: "30 20 * * *" # 02:00 IST
+  workflow_dispatch:
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci --omit=dev
+      - name: Reset demo data
+        run: |
+          if [ -z "$MONGO_URI" ]; then echo "MONGO_URI secret not set, skipping."; exit 0; fi
+          node src/scripts/seed.js
+        env:
+          MONGO_URI: ${{ secrets.MONGO_URI }}

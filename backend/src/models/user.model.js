@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema(
 
         // Suspended accounts cannot log in or use existing tokens
         isActive: { type: Boolean, default: true },
-        // Shared public demo accounts: read-only in the admin area (see blockDemoWrites)
+        // Shared public demo accounts: demo admin is read-only (see protect in auth.middleware.js)
         isDemo: { type: Boolean, default: false },
         // Bumped on logout/suspension: every token issued before that stops working
         tokenVersion: { type: Number, default: 0 },

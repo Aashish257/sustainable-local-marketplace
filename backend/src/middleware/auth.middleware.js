@@ -18,9 +18,18 @@ export const verifyAccessToken = async (token) => {
     return { id: user._id.toString(), role: user.role, name: user.name, isDemo: user.isDemo === true };
 };
 
+// The public demo admin login is shared with strangers: it may look at everything but change nothing.
+// The flag comes from the DB (verifyAccessToken), never from the token.
+const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+const DEMO_ADMIN_ALLOWED_WRITES = new Set(["/api/auth/logout"]);
+const isBlockedDemoWrite = (req) =>
+    req.user.isDemo && req.user.role === "admin" && !READ_METHODS.has(req.method) &&
+    !DEMO_ADMIN_ALLOWED_WRITES.has(req.originalUrl.split("?")[0]);
+
 export const protect = async (req, res, next) => {
     try {
         req.user = await verifyAccessToken(req.headers.authorization?.split(" ")[1]);
+        if (isBlockedDemoWrite(req)) return next(new AppError("This action is disabled in the public demo.", 403));
         next();
     } catch (err) {
         next(err.status ? err : new AppError("Unauthorized", 401));
@@ -49,12 +58,4 @@ export const authorize = (...roles) => {
         }
         next();
     };
-};
-// Public demo accounts may look around but not change anything (flag comes from the DB, not the token)
-const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
-export const blockDemoWrites = (req, res, next) => {
-    if (req.user?.isDemo && !READ_METHODS.has(req.method)) {
-        return next(new AppError("This action is disabled in the public demo.", 403));
-    }
-    next();
 };

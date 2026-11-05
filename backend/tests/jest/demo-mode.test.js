@@ -2,6 +2,10 @@ import request from "supertest";
 import jwt from "jsonwebtoken";
 import app from "../../src/app.js";
 import User from "../../src/models/user.model.js";
+import { Product } from "../../src/models/product.model.js";
+import { Order } from "../../src/models/order.model.js";
+import { Review } from "../../src/models/review.model.js";
+import { resetDemoData, DEMO_PRODUCTS, DEMO_USERS } from "../../src/scripts/demo-data.js";
 import { startDb, stopDb, clearDb, makeUser, makeProduct } from "./helpers.js";
 
 beforeAll(startDb);
@@ -68,5 +72,61 @@ describe("Public demo accounts", () => {
         const res = await request(app).post("/api/products").set(seller.auth)
             .send({ title: "Demo Jute Bag", description: "Handwoven jute shopping bag", price: 250, category: "Zero Waste", stock: 3 });
         expect(res.status).toBe(201);
+    });
+
+    it("demo admin cannot change order status through the orders route", async () => {
+        const admin = await makeDemo("admin");
+        const buyer = await makeUser("buyer");
+        const seller = await makeUser("seller");
+        const p = await makeProduct(seller.user._id);
+        const o = await Order.create({ buyerId: buyer.user._id, status: "paid", items: [{ productId: p._id, quantity: 1, price: 100 }], totalAmount: 100 });
+        const res = await request(app).patch(`/api/orders/${o._id}/status`).set(admin.auth).send({ status: "cancelled" });
+        expect(res.status).toBe(403);
+        expect((await Order.findById(o._id)).status).toBe("paid");
+    });
+
+    it("demo admin cannot request upload signatures", async () => {
+        const admin = await makeDemo("admin");
+        const res = await request(app).post("/api/uploads/signature").set(admin.auth).send({});
+        expect(res.status).toBe(403);
+    });
+
+    it("demo admin can still log out", async () => {
+        const admin = await makeDemo("admin");
+        const res = await request(app).post("/api/auth/logout").set(admin.auth);
+        expect(res.status).toBe(200);
+    });
+
+    it("logging out of a shared demo account does not sign out other people using it", async () => {
+        const buyer = await makeDemo("buyer");
+        const otherVisitor = { Authorization: buyer.auth.Authorization }; // same shared account, another browser
+        expect((await request(app).post("/api/auth/logout").set(buyer.auth)).status).toBe(200);
+        expect((await request(app).get("/api/auth/me").set(otherVisitor)).status).toBe(200);
+    });
+});
+
+describe("Demo data reset", () => {
+    it("restores demo accounts and products, and leaves real accounts alone", async () => {
+        await resetDemoData();
+        const owner = await makeUser("admin"); // the owner's private admin
+        const realSeller = await makeUser("seller");
+        const realProduct = await makeProduct(realSeller.user._id, { title: "Real Seller Product" });
+
+        // a visitor vandalises the demo
+        const demoSeller = await User.findOne({ email: DEMO_USERS.seller.email });
+        const demoBuyer = await User.findOne({ email: DEMO_USERS.buyer.email });
+        const demoProduct = await Product.findOne({ sellerId: demoSeller._id });
+        await Product.updateOne({ _id: demoProduct._id }, { title: "Rude title" });
+        await Review.create({ userId: demoBuyer._id, productId: demoProduct._id, rating: 1, comment: "spam spam spam" });
+
+        await resetDemoData();
+
+        expect(await User.findById(owner.user._id)).not.toBeNull();
+        expect(await Product.findById(realProduct._id)).not.toBeNull();
+        const seller = await User.findOne({ email: DEMO_USERS.seller.email });
+        const titles = (await Product.find({ sellerId: seller._id })).map((p) => p.title).sort();
+        expect(titles).toEqual(DEMO_PRODUCTS.map((p) => p.title).sort());
+        expect(await Review.countDocuments({ comment: "spam spam spam" })).toBe(0);
+        expect(await User.countDocuments({ isDemo: true })).toBe(3);
     });
 });
