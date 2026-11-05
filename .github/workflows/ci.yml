@@ -34,6 +34,9 @@ jobs:
       - name: Check for syntax errors
         run: node --check src/server.js
 
+      - name: Dependency audit (high and critical)
+        run: npm audit --omit=dev --audit-level=high
+
   # ─────────────────────────────────────────────
   # JOB 2: Run backend tests
   # ─────────────────────────────────────────────
@@ -107,6 +110,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Dependency audit (high and critical)
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Component tests (Vitest)
         run: npm test

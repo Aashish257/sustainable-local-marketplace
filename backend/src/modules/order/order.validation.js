@@ -18,6 +18,6 @@ export const verifyPaymentSchema = z.object({
 
 export const updateOrderStatusSchema = z.object({
     status: z.enum(["pending", "paid", "shipped", "delivered", "cancelled"], {
-        errorMap: () => ({ message: "Status must be pending, paid, shipped, delivered, or cancelled" })
+        error: "Status must be pending, paid, shipped, delivered, or cancelled"
     }),
 });
