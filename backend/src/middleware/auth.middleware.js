@@ -12,10 +12,10 @@ export const verifyAccessToken = async (token) => {
     } catch {
         throw new AppError("Unauthorized", 401);
     }
-    const user = await User.findById(decoded.id).select("name role isActive tokenVersion").lean();
+    const user = await User.findById(decoded.id).select("name role isActive tokenVersion isDemo").lean();
     if (!user || user.isActive === false) throw new AppError("Unauthorized", 401);
     if ((decoded.tv ?? 0) !== (user.tokenVersion ?? 0)) throw new AppError("Session expired, please log in again", 401);
-    return { id: user._id.toString(), role: user.role, name: user.name };
+    return { id: user._id.toString(), role: user.role, name: user.name, isDemo: user.isDemo === true };
 };
 
 export const protect = async (req, res, next) => {
@@ -49,4 +49,12 @@ export const authorize = (...roles) => {
         }
         next();
     };
+};
+// Public demo accounts may look around but not change anything (flag comes from the DB, not the token)
+const READ_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+export const blockDemoWrites = (req, res, next) => {
+    if (req.user?.isDemo && !READ_METHODS.has(req.method)) {
+        return next(new AppError("This action is disabled in the public demo.", 403));
+    }
+    next();
 };

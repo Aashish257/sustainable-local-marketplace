@@ -1,6 +1,15 @@
 import { homeFor } from '../../app/roles';
 import { Leaf } from 'lucide-react';
 import { useState } from 'react';
+
+// Public demo accounts (seeded by backend/src/scripts/seed.js). Hide with VITE_SHOW_DEMO_ACCOUNTS=false.
+const SHOW_DEMO = import.meta.env.VITE_SHOW_DEMO_ACCOUNTS !== 'false';
+const DEMO_PASSWORD = 'password123';
+const DEMO_ACCOUNTS = [
+    { label: 'Buyer', email: 'buyer@sustain.com' },
+    { label: 'Seller', email: 'seller@sustain.com' },
+    { label: 'Admin (read-only)', email: 'admin@sustain.com' },
+];
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { loginUser } from './api';
@@ -171,6 +180,31 @@ const LoginPage = () => {
                             {mutation.isPending ? 'Authenticating…' : 'Sign In →'}
                         </button>
                     </form>
+
+                    {SHOW_DEMO && (
+                        <div className="rounded-xl border border-[var(--border-card)] p-4">
+                            <p className="text-sm font-semibold text-[var(--text-main)]">Try the demo</p>
+                            <p className="text-xs text-[var(--text-muted)] mt-0.5 mb-3">Shared demo accounts, password <code>{DEMO_PASSWORD}</code>.</p>
+                            <ul className="space-y-2">
+                                {DEMO_ACCOUNTS.map((a) => (
+                                    <li key={a.email} className="flex items-center justify-between gap-3 text-sm">
+                                        <span className="min-w-0">
+                                            <span className="font-medium text-[var(--text-main)]">{a.label}</span>{' '}
+                                            <span className="text-[var(--text-muted)] break-all">{a.email}</span>
+                                        </span>
+                                        <button
+                                            type="button"
+                                            aria-label={`Use ${a.label.split(' ')[0]} demo account`}
+                                            onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
+                                            className="shrink-0 rounded-lg border border-[var(--border-card)] px-3 py-1 text-xs font-medium hover:border-emerald-500 cursor-pointer"
+                                        >
+                                            Use
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     <p className="text-center font-mono text-xs text-[var(--text-muted)]">
                         Secure sign-in · Payments by Razorpay

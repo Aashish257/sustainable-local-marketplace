@@ -113,21 +113,24 @@ const seedDatabase = async () => {
             name: "Super Admin",
             email: "admin@sustain.com",
             password: hashedPassword,
-            role: "admin"
+            role: "admin",
+            isDemo: true, // public demo account
         });
 
         const sellerUser = await User.create({
             name: "Demo Seller",
             email: "seller@sustain.com",
             password: hashedPassword,
-            role: "seller"
+            role: "seller",
+            isDemo: true, // public demo account
         });
 
         const buyerUser = await User.create({
             name: "Aria Green",
             email: "buyer@sustain.com",
             password: hashedPassword,
-            role: "buyer"
+            role: "buyer",
+            isDemo: true, // public demo account
         });
 
         console.log("📦 Inserting new products...");
