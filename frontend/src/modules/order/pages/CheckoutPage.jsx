@@ -119,8 +119,9 @@ const CheckoutPage = () => {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">Full Name</label>
+                                <label htmlFor="ship-name" className="text-xs font-semibold text-[var(--text-muted)] block mb-1">Full Name</label>
                                 <input
+                                    id="ship-name"
                                     type="text"
                                     required
                                     placeholder="e.g. Aarav Sharma"
@@ -130,8 +131,9 @@ const CheckoutPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">Phone Contact</label>
+                                <label htmlFor="ship-phone" className="text-xs font-semibold text-[var(--text-muted)] block mb-1">Phone Contact</label>
                                 <input
+                                    id="ship-phone"
                                     type="tel"
                                     required
                                     placeholder="+91 98765 43210"
@@ -143,8 +145,9 @@ const CheckoutPage = () => {
                         </div>
 
                         <div>
-                            <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">Street Address</label>
+                            <label htmlFor="ship-street" className="text-xs font-semibold text-[var(--text-muted)] block mb-1">Street Address</label>
                             <input
+                                    id="ship-street"
                                 type="text"
                                 required
                                 placeholder="House / Flat No., Street, Landmark"
@@ -156,8 +159,9 @@ const CheckoutPage = () => {
 
                         <div className="grid grid-cols-3 gap-3">
                             <div>
-                                <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">City</label>
+                                <label htmlFor="ship-city" className="text-xs font-semibold text-[var(--text-muted)] block mb-1">City</label>
                                 <input
+                                    id="ship-city"
                                     type="text"
                                     required
                                     placeholder="City"
@@ -167,8 +171,9 @@ const CheckoutPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">State</label>
+                                <label htmlFor="ship-state" className="text-xs font-semibold text-[var(--text-muted)] block mb-1">State</label>
                                 <input
+                                    id="ship-state"
                                     type="text"
                                     required
                                     placeholder="State"
@@ -178,8 +183,9 @@ const CheckoutPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-semibold text-[var(--text-muted)] block mb-1">PIN Code</label>
+                                <label htmlFor="ship-pin" className="text-xs font-semibold text-[var(--text-muted)] block mb-1">PIN Code</label>
                                 <input
+                                    id="ship-pin"
                                     type="text"
                                     required
                                     placeholder="6 digits"
@@ -224,7 +230,7 @@ const CheckoutPage = () => {
                         disabled={isPending}
                         className="btn-primary w-full py-4 text-xs font-bold uppercase tracking-wider disabled:opacity-50 cursor-pointer"
                     >
-                        {isPending ? 'Generating Order...' : 'Proceed to Payment Authorization →'}
+                        {isPending ? 'Generating Order...' : 'Continue to payment →'}
                     </button>
                 </form>
 

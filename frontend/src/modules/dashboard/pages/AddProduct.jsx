@@ -30,6 +30,7 @@ const AddProduct = () => {
         sustainabilityScore: 8,
         biddingEnabled: false,
         biddingStartingPrice: '',
+        biddingEndTime: '', // datetime-local value, e.g. "2026-11-01T18:00"
     });
 
     const mutation = useMutation({
@@ -43,6 +44,17 @@ const AddProduct = () => {
         onError: (err) => {
             toast.error(err.response?.data?.error || 'Failed to create product listing');
         }
+    });
+
+    // Allowed range for the auction end picker (local time, minute precision)
+    // Computed once when the form opens (lazy state keeps render pure)
+    const [{ minEnd, maxEnd }] = useState(() => {
+        const toLocalInput = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+        const now = Date.now();
+        return {
+            minEnd: toLocalInput(new Date(now + 60 * 60 * 1000)),
+            maxEnd: toLocalInput(new Date(now + 30 * 24 * 60 * 60 * 1000)),
+        };
     });
 
     const handleChange = (e) => {
@@ -66,6 +78,8 @@ const AddProduct = () => {
             sustainabilityScore: Number(formData.sustainabilityScore),
             biddingEnabled: Boolean(formData.biddingEnabled),
             biddingStartingPrice: formData.biddingEnabled ? Number(formData.biddingStartingPrice || formData.price) : undefined,
+            // datetime-local is local time; toISOString sends an unambiguous UTC time
+            biddingEndTime: formData.biddingEnabled && formData.biddingEndTime ? new Date(formData.biddingEndTime).toISOString() : undefined,
         };
 
         mutation.mutate(payload);
@@ -232,6 +246,19 @@ const AddProduct = () => {
                                         placeholder={formData.price ? `Starting at ₹${formData.price}` : 'Enter starting price'}
                                         className="w-full px-3 py-2 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-lg text-[var(--text-main)] font-mono text-xs focus:outline-none focus:border-emerald-500"
                                     />
+                                    <label htmlFor="biddingEndTime" className="block text-xs font-semibold text-[var(--text-main)] mt-3 mb-1">Auction ends</label>
+                                    <input
+                                        id="biddingEndTime"
+                                        type="datetime-local"
+                                        name="biddingEndTime"
+                                        required
+                                        min={minEnd}
+                                        max={maxEnd}
+                                        value={formData.biddingEndTime}
+                                        onChange={handleChange}
+                                        className="w-full px-3 py-2 bg-[var(--bg-page)] border border-[var(--border-card)] rounded-lg text-[var(--text-main)] text-xs focus:outline-none focus:border-emerald-500"
+                                    />
+                                    <p className="text-xs text-[var(--text-muted)] mt-1">Up to 30 days from now. The highest bidder wins when time runs out.</p>
                                 </div>
                             )}
                         </div>
